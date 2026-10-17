@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import {
+  Banknote,
   BookOpen,
   CalendarDays,
   CalendarRange,
@@ -37,7 +38,7 @@ export function useAdminOutlet() {
 
 export function AdminLayout() {
   const { user, logout } = useAuth();
-  const { period, promissoryNotes, loadAdminData, setActiveTerm } = useApp();
+  const { period, promissoryNotes, withdrawalRequests, loadAdminData, setActiveTerm } = useApp();
   const navigate = useNavigate();
   const [paymentFor, setPaymentFor] = useState<Student | null | undefined>(undefined);
   const [loadError, setLoadError] = useState('');
@@ -47,6 +48,7 @@ export function AdminLayout() {
   }, [loadAdminData]);
 
   const pendingCount = promissoryNotes.filter((n) => n.status === 'pending').length;
+  const pendingWithdrawals = withdrawalRequests.filter((w) => w.status === 'pending').length;
 
   const navSections: { title: string; items: NavItem[] }[] = [
     { title: 'Overview', items: [{ to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true }] },
@@ -54,7 +56,8 @@ export function AdminLayout() {
       title: 'Accounts',
       items: [
         { to: '/admin/students', icon: Users, label: 'Students & SOA' },
-        { to: '/admin/promissory-notes', icon: FileSignature, label: 'Promissory Notes', badge: pendingCount }
+        { to: '/admin/promissory-notes', icon: FileSignature, label: 'Promissory Notes', badge: pendingCount },
+        { to: '/admin/withdrawals', icon: Banknote, label: 'Withdrawal Requests', badge: pendingWithdrawals }
       ]
     },
     {
@@ -155,7 +158,7 @@ export function AdminLayout() {
                 {period.academicYear} · {period.semester}
               </span>
             )}
-            <div className="flex items-center rounded-full bg-slate-100 p-1" role="radiogroup" aria-label="Active exam term">
+            <div className="flex items-center gap-0.5 overflow-x-auto rounded-full bg-slate-100 p-1" role="radiogroup" aria-label="Active exam term">
               {ALL_EXAM_TERMS.map((t) => {
                 const active = period?.activeTerm === t;
                 return (
@@ -165,7 +168,7 @@ export function AdminLayout() {
                     role="radio"
                     aria-checked={active}
                     onClick={() => !active && handleTermChange(t)}
-                    className={`rounded-full px-3.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                       active ? 'bg-snc-green text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
                     }`}
                   >

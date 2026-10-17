@@ -16,11 +16,16 @@ import {
  * Self-service kiosk payment: no cashier involved, so there is no O.R. number to type in —
  * the kiosk generates one and posts the payment straight to the ledger as "Cash".
  * (Stand-in for a future bill-acceptor/biller device; see KioskPayBalanceSection.)
+ *
+ * apply_to: "dues" (default) settles the outstanding balance and may clear permits.
+ * apply_to: "deposit" instead holds the amount as account credit (payment.IS_DEPOSIT) —
+ * it does not touch dues or permits, and is later cashed out via a withdrawal_request.
  */
 export async function kioskCreate(req, res) {
   try {
     const { student_id } = req.body;
     const amount = round2(req.body.amount);
+    const applyTo = req.body.apply_to === "deposit" ? "deposit" : "dues";
 
     if (!student_id) return res.status(400).json({ error: "Session expired. Please sign in again." });
     if (!(amount > 0)) return res.status(400).json({ error: "Payment amount must be greater than ₱0" });
@@ -30,7 +35,7 @@ export async function kioskCreate(req, res) {
 
     const before = await studentModel.findProfile(period, Number(student_id));
     if (!before) return res.status(404).json({ error: "Student not found" });
-    if (amount > before.ledger.outstandingBalance + 0.01) {
+    if (applyTo === "dues" && amount > before.ledger.outstandingBalance + 0.01) {
       return res.status(400).json({ error: "Amount exceeds your outstanding balance" });
     }
 
@@ -44,20 +49,23 @@ export async function kioskCreate(req, res) {
       amount,
       payment_method: "Cash",
       allocation: null,
-      remarks: "Self-service kiosk payment",
+      remarks: applyTo === "deposit" ? "Self-service kiosk deposit" : "Self-service kiosk payment",
+      is_deposit: applyTo === "deposit",
       encoded_by: null,
     });
     const or_number = `${new Date().getFullYear()}-${String(paymentId).padStart(6, "0")}`;
     await paymentModel.updateOrNumber(paymentId, or_number);
 
     const after = await studentModel.findProfile(period, before.id);
-    const cleared = await permitModel.clearPaidTerms(after, period.id, null);
+    const cleared = applyTo === "dues" ? await permitModel.clearPaidTerms(after, period.id, null) : [];
 
     await logModel.addLog({
       action: "payment",
       description:
-        `Self-service kiosk payment of ₱${amount.toLocaleString()} (Cash) with ${or_number}` +
-        (cleared.length ? `. Permits cleared: ${cleared.join(", ")}` : ""),
+        applyTo === "deposit"
+          ? `Self-service kiosk deposit of ₱${amount.toLocaleString()} (Cash) with ${or_number}`
+          : `Self-service kiosk payment of ₱${amount.toLocaleString()} (Cash) with ${or_number}` +
+            (cleared.length ? `. Permits cleared: ${cleared.join(", ")}` : ""),
       actor: "Student (Kiosk)",
       studentId: before.id,
     });

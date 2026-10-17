@@ -1,6 +1,6 @@
-export type ExamTerm = 'Prelim' | 'Midterm' | 'Prefinal' | 'Finals';
+export type ExamTerm = 'Long Test Prelim' | 'Prelim' | 'Long Test Midterm' | 'Midterm' | 'Prefinal' | 'Finals';
 
-export type TermKey = 'prelim' | 'midterm' | 'prefinal' | 'finals';
+export type TermKey = 'longTestPrelim' | 'prelim' | 'longTestMidterm' | 'midterm' | 'prefinal' | 'finals';
 
 export type PermitStatus = 'cleared' | 'locked' | 'promissory_cleared';
 
@@ -34,6 +34,8 @@ export interface PaymentRecord {
   amount: number;
   paymentMethod: PaymentMethod;
   remarks?: string;
+  /** Held as account credit instead of applied to a term due; see availableCredit. */
+  isDeposit?: boolean;
 }
 
 export interface TermDue {
@@ -58,6 +60,8 @@ export interface StudentLedger {
   totalAssessed: number;
   totalPaid: number;
   outstandingBalance: number;
+  /** Deposited payments not yet withdrawn (sum of deposits minus released withdrawals). */
+  availableCredit: number;
   termBreakdown: Record<TermKey, TermDue>;
   payments: PaymentRecord[];
 }
@@ -127,6 +131,23 @@ export interface PromissoryNote {
   reviewRemarks?: string;
 }
 
+export interface WithdrawalRequest {
+  id: number;
+  referenceNo: string;
+  studentPk: number;
+  studentLrn: string;
+  studentId: string;
+  studentName: string;
+  program: string;
+  yearSection: string;
+  amount: number;
+  status: 'pending' | 'released' | 'declined';
+  requestedAt: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  reviewRemarks?: string;
+}
+
 export interface AuditLog {
   id: number;
   timestamp: string;
@@ -138,17 +159,19 @@ export interface AuditLog {
 }
 
 export interface PrintedSlip {
-  type: 'soa' | 'permit' | 'promissory_receipt' | 'payment_slip';
+  type: 'soa' | 'permit' | 'promissory_receipt' | 'payment_slip' | 'deposit_slip' | 'withdrawal_slip';
   student: Student;
   term?: ExamTerm;
   promissoryNote?: PromissoryNote;
   timestamp: string;
-  /** O.R. number of the cash payment this receipt is for (payment_slip only) — same one listed under Payments on the SOA. */
+  /** O.R. number of the cash payment this receipt is for (payment_slip/deposit_slip only) — same one listed under Payments on the SOA. */
   reference?: string;
-  /** Amount paid (payment_slip only). */
+  /** Amount paid or deposited (payment_slip/deposit_slip only). */
   amount?: number;
-  /** Date the payment was recorded (payment_slip only); lets a past payment be reprinted with its original date, not today's. */
+  /** Date the payment was recorded (payment_slip/deposit_slip only); lets a past payment be reprinted with its original date, not today's. */
   paymentDate?: string;
   /** True when this is a reprint of a past payment from the Payments list, not the receipt for a payment just made. */
   isReprint?: boolean;
+  /** The withdrawal request this receipt is for (withdrawal_slip only). */
+  withdrawal?: WithdrawalRequest;
 }

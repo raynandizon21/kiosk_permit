@@ -19,7 +19,7 @@ export async function upsertPermit({ studentId, periodId, term, status, permitNu
  * Never downgrades a permit that is already cleared or cleared by promissory note.
  */
 export async function clearPaidTerms(profile, periodId, issuedBy) {
-  const keys = ["prelim", "midterm", "prefinal", "finals"];
+  const keys = ["longTestPrelim", "prelim", "longTestMidterm", "midterm", "prefinal", "finals"];
   const newlyCleared = [];
   for (const [i, term] of EXAM_TERMS.entries()) {
     const due = profile.ledger.termBreakdown[keys[i]];

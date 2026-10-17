@@ -9,6 +9,7 @@ USE `kiosk_permit`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `audit_log`;
+DROP TABLE IF EXISTS `withdrawal_request`;
 DROP TABLE IF EXISTS `promissory_note`;
 DROP TABLE IF EXISTS `exam_permit`;
 DROP TABLE IF EXISTS `payment`;
@@ -42,7 +43,7 @@ CREATE TABLE `academic_period` (
   `IDNo` int(11) NOT NULL AUTO_INCREMENT,
   `ACADEMIC_YEAR` varchar(20) NOT NULL COMMENT 'e.g. 2024-2025',
   `SEMESTER` varchar(30) NOT NULL COMMENT 'e.g. 1st Semester',
-  `ACTIVE_TERM` enum('Prelim','Midterm','Prefinal','Finals') NOT NULL DEFAULT 'Prelim',
+  `ACTIVE_TERM` enum('Long Test Prelim','Prelim','Long Test Midterm','Midterm','Prefinal','Finals') NOT NULL DEFAULT 'Prelim',
   `START_DATE` date DEFAULT NULL COMMENT 'Semester start, e.g. first day of classes',
   `END_DATE` date DEFAULT NULL COMMENT 'Semester end, e.g. last day of finals',
   `IS_CURRENT` tinyint(1) NOT NULL DEFAULT 0,
@@ -165,6 +166,7 @@ CREATE TABLE `payment` (
   `ALLOCATION` varchar(80) DEFAULT NULL COMMENT 'e.g. Midterm Examination Dues',
   `REMARKS` varchar(255) DEFAULT NULL,
   `PAYMENT_DT` date NOT NULL,
+  `IS_DEPOSIT` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Held as account credit instead of applied to a term due; see withdrawal_request',
   `ENCODED_BY` int(11) DEFAULT NULL,
   `ENCODED_DT` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`IDNo`),
@@ -174,12 +176,33 @@ CREATE TABLE `payment` (
   CONSTRAINT `fk_pay_period` FOREIGN KEY (`PERIOD_ID`) REFERENCES `academic_period` (`IDNo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- A self-service deposit (payment.IS_DEPOSIT = 1) the student later asks to cash out.
+-- Available credit = sum of deposit payments − sum of released withdrawals.
+CREATE TABLE `withdrawal_request` (
+  `IDNo` int(11) NOT NULL AUTO_INCREMENT,
+  `REFERENCE_NO` varchar(40) DEFAULT NULL,
+  `STUDENT_ID` int(11) NOT NULL,
+  `PERIOD_ID` int(11) NOT NULL,
+  `AMOUNT` decimal(12,2) NOT NULL,
+  `STATUS` enum('pending','released','declined') NOT NULL DEFAULT 'pending',
+  `REQUESTED_DT` datetime NOT NULL DEFAULT current_timestamp(),
+  `REVIEWED_BY` int(11) DEFAULT NULL,
+  `REVIEWED_DT` datetime DEFAULT NULL,
+  `REMARKS` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`IDNo`),
+  UNIQUE KEY `uk_wd_reference` (`REFERENCE_NO`),
+  KEY `idx_wd_status` (`STATUS`),
+  CONSTRAINT `fk_wd_student` FOREIGN KEY (`STUDENT_ID`) REFERENCES `student` (`IDNo`),
+  CONSTRAINT `fk_wd_period` FOREIGN KEY (`PERIOD_ID`) REFERENCES `academic_period` (`IDNo`),
+  CONSTRAINT `fk_wd_reviewer` FOREIGN KEY (`REVIEWED_BY`) REFERENCES `user_info` (`IDNo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Exam permit per student per term. No row = locked.
 CREATE TABLE `exam_permit` (
   `IDNo` int(11) NOT NULL AUTO_INCREMENT,
   `STUDENT_ID` int(11) NOT NULL,
   `PERIOD_ID` int(11) NOT NULL,
-  `EXAM_TERM` enum('Prelim','Midterm','Prefinal','Finals') NOT NULL,
+  `EXAM_TERM` enum('Long Test Prelim','Prelim','Long Test Midterm','Midterm','Prefinal','Finals') NOT NULL,
   `STATUS` enum('cleared','promissory_cleared','locked') NOT NULL DEFAULT 'locked',
   `PERMIT_NUMBER` varchar(40) DEFAULT NULL,
   `ISSUED_DT` datetime DEFAULT NULL,
@@ -195,7 +218,7 @@ CREATE TABLE `promissory_note` (
   `REFERENCE_NO` varchar(40) DEFAULT NULL,
   `STUDENT_ID` int(11) NOT NULL,
   `PERIOD_ID` int(11) NOT NULL,
-  `EXAM_TERM` enum('Prelim','Midterm','Prefinal','Finals') NOT NULL,
+  `EXAM_TERM` enum('Long Test Prelim','Prelim','Long Test Midterm','Midterm','Prefinal','Finals') NOT NULL,
   `BALANCE_AMOUNT` decimal(12,2) NOT NULL,
   `COMMITTED_AMOUNT` decimal(12,2) NOT NULL,
   `COMMITTED_DATE` date NOT NULL,
@@ -220,7 +243,7 @@ CREATE TABLE `promissory_note` (
 -- Kiosk + admin activity trail
 CREATE TABLE `audit_log` (
   `IDNo` int(11) NOT NULL AUTO_INCREMENT,
-  `ACTION` varchar(40) NOT NULL COMMENT 'kiosk_login | soa_print | permit_print | payment_slip_print | promissory_submit | pn_approve | pn_reject | payment | permit_override | term_change',
+  `ACTION` varchar(40) NOT NULL COMMENT 'kiosk_login | soa_print | permit_print | payment_slip_print | deposit_slip_print | withdrawal_slip_print | promissory_submit | pn_approve | pn_reject | payment | wd_submit | wd_release | wd_decline | permit_override | term_change',
   `DESCRIPTION` varchar(500) NOT NULL,
   `ACTOR` varchar(120) NOT NULL,
   `STUDENT_ID` int(11) DEFAULT NULL,

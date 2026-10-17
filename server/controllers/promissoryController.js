@@ -13,7 +13,14 @@ import {
   round2,
 } from "../utils/helpers.js";
 
-const TERM_KEY = { Prelim: "prelim", Midterm: "midterm", Prefinal: "prefinal", Finals: "finals" };
+const TERM_KEY = {
+  "Long Test Prelim": "longTestPrelim",
+  Prelim: "prelim",
+  "Long Test Midterm": "longTestMidterm",
+  Midterm: "midterm",
+  Prefinal: "prefinal",
+  Finals: "finals",
+};
 
 export async function list(req, res) {
   try {

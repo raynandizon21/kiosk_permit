@@ -3,6 +3,7 @@ import studentRoutes from "./studentRoutes.js";
 import paymentRoutes from "./paymentRoutes.js";
 import permitRoutes from "./permitRoutes.js";
 import promissoryRoutes from "./promissoryRoutes.js";
+import withdrawalRoutes from "./withdrawalRoutes.js";
 import logRoutes from "./logRoutes.js";
 import authRoutes from "./authRoutes.js";
 import fileMaintenanceRoutes from "./fileMaintenanceRoutes.js";
@@ -20,6 +21,7 @@ export function registerRoutes(app) {
   app.use("/api/payments", paymentRoutes);
   app.use("/api/permits", permitRoutes);
   app.use("/api/promissory-notes", promissoryRoutes);
+  app.use("/api/withdrawals", withdrawalRoutes);
   app.use("/api/logs", logRoutes);
   app.use("/api/file-maintenance", fileMaintenanceRoutes);
 }

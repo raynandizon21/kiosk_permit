@@ -8,7 +8,14 @@ import { AdminModal, adminBtnPrimary } from './AdminModal';
 import { useAdminOutlet } from './AdminLayout';
 import { AdminPageHeader, AdminStat, DataCard, FilterTabs, IconAction, NewRecordButton, StatusPill, tbl } from './AdminPageParts';
 
-const TERM_ABBR: Record<ExamTerm, string> = { Prelim: 'PR', Midterm: 'MT', Prefinal: 'PF', Finals: 'FN' };
+const TERM_ABBR: Record<ExamTerm, string> = {
+  'Long Test Prelim': 'LP',
+  Prelim: 'PR',
+  'Long Test Midterm': 'LM',
+  Midterm: 'MT',
+  Prefinal: 'PF',
+  Finals: 'FN'
+};
 
 const PERMIT_STYLE: Record<PermitStatus, string> = {
   cleared: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100',
@@ -163,7 +170,7 @@ export const AdminStudentLedger: React.FC = () => {
 
             <div>
               <h4 className="mb-2 text-xs font-semibold uppercase text-slate-500">Exam dues</h4>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {ALL_EXAM_TERMS.map((term) => {
                   const due = inspect.ledger.termBreakdown[TERM_KEY_MAP[term]];
                   const permit = inspect.permits[TERM_KEY_MAP[term]];

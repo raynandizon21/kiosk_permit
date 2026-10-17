@@ -8,6 +8,7 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminOverview } from './components/admin/AdminOverview';
 import { AdminStudentLedger } from './components/admin/AdminStudentLedger';
 import { AdminPromissoryWorkbench } from './components/admin/AdminPromissoryWorkbench';
+import { AdminWithdrawalRequests } from './components/admin/AdminWithdrawalRequests';
 import { AdminActivityLogs } from './components/admin/AdminActivityLogs';
 import { AdminStudentList } from './components/admin/maintenance/AdminStudentList';
 import { AdminAssessments } from './components/admin/maintenance/AdminAssessments';
@@ -33,6 +34,7 @@ export default function App() {
               <Route index element={<AdminOverview />} />
               <Route path="students" element={<AdminStudentLedger />} />
               <Route path="promissory-notes" element={<AdminPromissoryWorkbench />} />
+              <Route path="withdrawals" element={<AdminWithdrawalRequests />} />
               <Route path="logs" element={<AdminActivityLogs />} />
               <Route path="maintenance/students" element={<AdminStudentList />} />
               <Route path="maintenance/assessments" element={<AdminAssessments />} />

@@ -66,6 +66,8 @@ If the database was created with an older version, run these once, in order, in 
 2. `database/migrations/002_subject_course.sql`
 3. `database/migrations/003_subject_course_many.sql`
 4. `database/migrations/004_period_dates.sql`
+5. `database/migrations/005_six_exam_terms.sql`
+6. `database/migrations/006_deposits_and_withdrawals.sql`
 
 ## Running the system
 
@@ -187,8 +189,8 @@ The debug APK above is fine for your own tablets. For a **release** build meant 
 
 | Service | What the student sees |
 |---|---|
-| Statement of Account | Fees, other fees and discounts, total paid, remaining balance, dues per exam term, payment history (each with a reprint button). Can **pay the balance (cash) right at the kiosk** — posts to the ledger immediately and prints a receipt — or print the SOA. |
-| Examination Permit | Permit for each term (Prelim, Midterm, Prefinal, Finals) with subjects and proctor signature lines. Locked terms show the balance, a **Pay Balance (Cash)** option, and a shortcut to a promissory note. |
+| Statement of Account | Fees, other fees and discounts, total paid, remaining balance, dues per exam term, payment history (each with a reprint button). Can **pay the balance (cash) right at the kiosk** — posts to the ledger immediately and prints a receipt — or print the SOA. Paying more than the current due can instead be **deposited as account credit** rather than applied forward, and that credit can be **withdrawn** (prints a receipt to present to the Cashier, released once Accounting processes it). |
+| Examination Permit | Permit for each term (Long Test Prelim, Prelim, Long Test Midterm, Midterm, Prefinal, Finals) with subjects and proctor signature lines. Locked terms show the balance, a **Pay Balance (Cash)** option, and a shortcut to a promissory note. |
 | Promissory Note | Request form (exam term, amount, payment date, reason, guardian, touch signature) and the status of past requests. Prints a receipt. |
 
 4. **Print the slip** and present it with the school ID. **End Session** returns to the welcome screen.
@@ -200,6 +202,7 @@ The debug APK above is fine for your own tablets. For a **release** build meant 
 | Overview | Dashboard | Totals, collection rate, permit clearance per term, highest balances, pending notes, recent activity |
 | Accounts | Students & SOA | Balances and payment progress; view a student's SOA; record payments; clear or lock permits |
 | Accounts | Promissory Notes | Review requests from the kiosk — approve (clears the permit) or decline with a reason |
+| Accounts | Withdrawal Requests | Review deposit cash-out requests from the kiosk — release (hand over the cash) or decline with a reason |
 | File Maintenance | Student List | Add, edit, deactivate, restore students. The course's subjects are enrolled automatically |
 | File Maintenance | Assessment | Per-student fees (tuition, lab, misc, previous balance, other fees and discounts) and enrolled subjects |
 | File Maintenance | Courses | Programs offered |
@@ -208,13 +211,15 @@ The debug APK above is fine for your own tablets. For a **release** build meant 
 | System | Activity Logs | Every kiosk and staff action |
 | System | Admin Users | Staff accounts and passwords |
 
-The top bar holds the **exam term switcher** (Prelim / Midterm / Prefinal / Finals), the **notification bell**, and **Record Payment**.
+The top bar holds the **exam term switcher** (Long Test Prelim / Prelim / Long Test Midterm / Midterm / Prefinal / Finals), the **notification bell**, and **Record Payment**.
 
 ## How the system works
 
-**Permits.** A student's total assessment is split evenly across the four exam terms. When a payment is recorded — by the cashier in the portal, or by the student themselves at the kiosk (**Pay Balance (Cash)**, cash only, posts immediately with its own O.R. number) — every term whose cumulative due is now paid becomes **cleared** automatically. Approving a promissory note marks that term **cleared via promissory note**. Staff can still clear or lock any term by hand.
+**Permits.** A student's total assessment is split evenly across the six exam terms (Long Test Prelim, Prelim, Long Test Midterm, Midterm, Prefinal, Finals). When a payment is recorded — by the cashier in the portal, or by the student themselves at the kiosk (**Pay Balance (Cash)**, cash only, posts immediately with its own O.R. number) — every term whose cumulative due is now paid becomes **cleared** automatically. Approving a promissory note marks that term **cleared via promissory note**. Staff can still clear or lock any term by hand.
 
 **Assessment total** = tuition + laboratory + miscellaneous + previous balance + other fees − discounts.
+
+**Deposits & withdrawals.** At the kiosk, a student paying more than what's needed to settle dues can instead choose to **deposit** that amount as account credit — it is held separately (`payment.IS_DEPOSIT`) and does **not** count toward dues or clear any permit until the student says so. That credit can later be cashed out: the kiosk submits a **withdrawal request** (its own O.R.-style reference number, printed receipt), which accounting **releases** (after handing over the cash) or **declines** from **Withdrawal Requests** in the portal — the same approve/decline pattern as promissory notes.
 
 **Subjects and courses.** A subject can belong to several courses. Adding a student, or changing their course, enrolls the course's subjects; general subjects (no course) are added by hand in Assessment.
 
@@ -226,7 +231,7 @@ The top bar holds the **exam term switcher** (Prelim / Midterm / Prefinal / Fina
 
 ## Database
 
-`database/schema.sql` — 13 tables:
+`database/schema.sql` — 14 tables:
 
 | Table | Holds |
 |---|---|
@@ -238,7 +243,8 @@ The top bar holds the **exam term switcher** (Prelim / Midterm / Prefinal / Fina
 | `student` | Student records (LRN, student number, optional RFID card) |
 | `student_subject` | Enrolled subjects per student per semester |
 | `assessment`, `assessment_item` | Fees per student per semester; other fees and discounts |
-| `payment` | Payments — cashier-recorded or self-service kiosk cash (unique O.R. number either way) |
+| `payment` | Payments — cashier-recorded or self-service kiosk cash (unique O.R. number either way); `IS_DEPOSIT` marks one held as account credit instead of applied to dues |
+| `withdrawal_request` | Requests to cash out deposited credit; pending until accounting releases or declines it |
 | `exam_permit` | Permit status per student, semester, and term |
 | `promissory_note` | Requests from the kiosk, with signature and review |
 | `audit_log` | Activity trail (also drives real-time updates) |
@@ -259,10 +265,12 @@ The top bar holds the **exam term switcher** (Prelim / Midterm / Prefinal / Fina
 | DELETE / PUT | `/api/students/:id`, `/api/students/:id/restore` | Deactivate / restore |
 | GET / PUT | `/api/students/:id/record`, `/api/students/:id/assessment` | Read / save fees and subjects |
 | POST | `/api/payments` | Record payment (cashier, requires an O.R. number) |
-| POST | `/api/payments/kiosk` | Self-service cash payment from the kiosk (generates its own O.R. number) |
+| POST | `/api/payments/kiosk` | Self-service cash payment from the kiosk (generates its own O.R. number); `apply_to` is `dues` (default) or `deposit` |
 | PUT | `/api/permits` | Clear or lock a permit |
 | GET / POST | `/api/promissory-notes` | List / submit from kiosk |
 | PUT | `/api/promissory-notes/:id/review` | Approve or decline |
+| GET / POST | `/api/withdrawals` | List / submit a deposit cash-out request from kiosk |
+| PUT | `/api/withdrawals/:id/review` | Release or decline |
 | GET / POST | `/api/logs` | Activity log / kiosk print events |
 | GET / POST / PUT / DELETE | `/api/file-maintenance/:type` | `courses`, `subjects`, `periods`, `users` |
 | PUT | `/api/file-maintenance/:type/:id/restore` | Restore |
@@ -303,7 +311,7 @@ public/images/uploads/      school logo and campus photo
 | **System Offline** on the kiosk | Start MySQL in XAMPP and check `MYSQL_*` in `.env`, then restart `npm run dev`. |
 | Tablet cannot open the page | Same Wi-Fi as the PC? Run `npm run firewall:allow` as Administrator. Use the PC's current IP from the server output. |
 | "Student Number or LRN not found" | The student must exist and be active in **Student List**. |
-| Permit still locked after payment | The payment must cover that term's due (total ÷ 4, cumulative). Or clear it by hand in **Students & SOA**. |
+| Permit still locked after payment | The payment must cover that term's due (total ÷ 6, cumulative). Or clear it by hand in **Students & SOA**. |
 | Changes do not appear on another screen | Both screens must be connected to the same server. After updating the code, restart `npm run dev`. |
 | Port 3200 already in use | Another copy of the server is running, or change `PORT` in `.env`. |
 | APK installs but shows a blank/error screen | Wrong or unreachable IP in `capacitor.config.ts` → `server.url`. Fix it, then `npm run cap:sync` and rebuild the APK. Confirm the tablet is on the same Wi-Fi and `npm run dev` is running. |

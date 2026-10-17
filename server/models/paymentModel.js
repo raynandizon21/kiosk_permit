@@ -3,8 +3,8 @@ import { pool } from "../config/database.js";
 export async function createPayment(data) {
   const [result] = await pool.execute(
     `INSERT INTO payment
-     (STUDENT_ID, PERIOD_ID, OR_NUMBER, AMOUNT, PAYMENT_METHOD, ALLOCATION, REMARKS, PAYMENT_DT, ENCODED_BY)
-     VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)`,
+     (STUDENT_ID, PERIOD_ID, OR_NUMBER, AMOUNT, PAYMENT_METHOD, ALLOCATION, REMARKS, PAYMENT_DT, IS_DEPOSIT, ENCODED_BY)
+     VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, ?)`,
     [
       data.student_id,
       data.period_id,
@@ -13,6 +13,7 @@ export async function createPayment(data) {
       data.payment_method,
       data.allocation,
       data.remarks,
+      data.is_deposit ? 1 : 0,
       data.encoded_by,
     ]
   );

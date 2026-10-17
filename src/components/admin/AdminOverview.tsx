@@ -167,8 +167,8 @@ export const AdminOverview: React.FC = () => {
             {termRows.map(({ term, counts }) => {
               const active = term === currentExamTerm;
               return (
-                <div key={term} className={`grid grid-cols-[5.5rem_1fr_3rem] items-center gap-3 rounded-xl px-2 py-1.5 ${active ? 'bg-emerald-50' : ''}`}>
-                  <span className={`text-sm ${active ? 'font-bold text-snc-green' : 'text-slate-600'}`}>
+                <div key={term} className={`grid grid-cols-[8rem_1fr_3rem] items-center gap-3 rounded-xl px-2 py-1.5 ${active ? 'bg-emerald-50' : ''}`}>
+                  <span className={`text-xs ${active ? 'font-bold text-snc-green' : 'text-slate-600'}`}>
                     {term}
                     {active && <span className="block text-[10px] font-semibold uppercase tracking-wider">Current</span>}
                   </span>

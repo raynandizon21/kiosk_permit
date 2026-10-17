@@ -64,6 +64,7 @@ export const MaintenancePanel: React.FC<MaintenancePanelProps> = ({
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'active' | 'inactive' | 'all'>('active');
   const [editing, setEditing] = useState<Row | 'new' | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState('');
@@ -102,10 +103,11 @@ export const MaintenancePanel: React.FC<MaintenancePanelProps> = ({
   const cellText = (row: Row, c: Field) => (c.display ? c.display(row) : String(row[c.key] ?? '—'));
 
   const filtered = useMemo(() => {
+    const statusRows = statusFilter === 'all' ? rows : rows.filter((r) => r.active === (statusFilter === 'active'));
     const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => columns.some((c) => cellText(r, c).toLowerCase().includes(q)));
-  }, [rows, query, columns]);
+    if (!q) return statusRows;
+    return statusRows.filter((r) => columns.some((c) => cellText(r, c).toLowerCase().includes(q)));
+  }, [rows, query, columns, statusFilter]);
 
   const openForm = (row: Row | 'new') => {
     const next: Record<string, string> = {};
@@ -152,9 +154,24 @@ export const MaintenancePanel: React.FC<MaintenancePanelProps> = ({
       <AdminPageHeader section="File Maintenance" title={title} subtitle={subtitle} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <AdminStat label={`Active ${plural}`} value={String(activeCount)} />
-        <AdminStat label={`Total ${plural}`} value={String(rows.length)} />
-        <AdminStat label="Deactivated" value={String(rows.length - activeCount)} />
+        <AdminStat
+          label={`Active ${plural}`}
+          value={String(activeCount)}
+          active={statusFilter === 'active'}
+          onClick={() => setStatusFilter('active')}
+        />
+        <AdminStat
+          label={`Total ${plural} (Show All)`}
+          value={String(rows.length)}
+          active={statusFilter === 'all'}
+          onClick={() => setStatusFilter('all')}
+        />
+        <AdminStat
+          label="Deactivated"
+          value={String(rows.length - activeCount)}
+          active={statusFilter === 'inactive'}
+          onClick={() => setStatusFilter('inactive')}
+        />
       </div>
 
       {pageError && (

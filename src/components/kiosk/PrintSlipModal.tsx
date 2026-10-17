@@ -9,7 +9,9 @@ const TITLES = {
   soa: 'Statement of Account',
   permit: 'Examination Permit',
   promissory_receipt: 'Promissory Note Receipt',
-  payment_slip: 'Payment Receipt'
+  payment_slip: 'Payment Receipt',
+  deposit_slip: 'Deposit Receipt',
+  withdrawal_slip: 'Withdrawal Request Receipt'
 };
 
 const Line: React.FC<{ label: string; value: React.ReactNode; strong?: boolean }> = ({ label, value, strong }) => (
@@ -24,7 +26,7 @@ export const PrintSlipModal: React.FC = () => {
   const { printedSlip, dismissPrintSlip } = useApp();
   if (!printedSlip) return null;
 
-  const { type, student, term, promissoryNote: note, timestamp, reference, amount, paymentDate, isReprint } = printedSlip;
+  const { type, student, term, promissoryNote: note, timestamp, reference, amount, paymentDate, isReprint, withdrawal } = printedSlip;
   const permit = term ? student.permits[TERM_KEY_MAP[term]] : undefined;
 
   if (type === 'permit' && permit) {
@@ -108,10 +110,16 @@ export const PrintSlipModal: React.FC = () => {
     <div className="fixed inset-0 z-[60] bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="w-full max-w-sm">
         <div className="printable-area relative bg-white text-slate-900 rounded-2xl shadow-2xl p-6 text-xs space-y-4 font-mono-code">
-          {type === 'payment_slip' && reference && (
+          {(type === 'payment_slip' || type === 'deposit_slip') && reference && (
             <div className="absolute right-6 top-6 text-right">
               <span className="block text-[9px] uppercase tracking-wide text-slate-400">Invoice Number</span>
               <span className="block font-bold text-red-600">{reference}</span>
+            </div>
+          )}
+          {type === 'withdrawal_slip' && withdrawal && (
+            <div className="absolute right-6 top-6 text-right">
+              <span className="block text-[9px] uppercase tracking-wide text-slate-400">Reference No.</span>
+              <span className="block font-bold text-red-600">{withdrawal.referenceNo}</span>
             </div>
           )}
 
@@ -162,8 +170,41 @@ export const PrintSlipModal: React.FC = () => {
             </div>
           )}
 
+          {type === 'deposit_slip' && (
+            <div className="space-y-2">
+              <Line label="Amount deposited" value={peso(amount ?? 0, true)} strong />
+              <Line label="Mode of payment" value="Cash" />
+              {paymentDate && <Line label="Deposited on" value={formatDate(paymentDate)} />}
+              <Line label="Available credit" value={peso(student.ledger.availableCredit, true)} />
+              <Line label="Status" value="DEPOSITED — not applied to dues" />
+            </div>
+          )}
+
+          {type === 'withdrawal_slip' && withdrawal && (
+            <div className="space-y-2">
+              <Line label="Amount requested" value={peso(withdrawal.amount, true)} strong />
+              <Line label="Requested on" value={formatDate(withdrawal.requestedAt)} />
+              <Line
+                label="Status"
+                value={
+                  withdrawal.status === 'released'
+                    ? 'RELEASED — cash already claimed'
+                    : withdrawal.status === 'declined'
+                      ? `DECLINED${withdrawal.reviewRemarks ? ` — ${withdrawal.reviewRemarks}` : ''}`
+                      : 'PENDING — present this to the Cashier'
+                }
+              />
+            </div>
+          )}
+
           <p className="pt-3 border-t border-dashed border-slate-300 text-center text-[10px] text-slate-500">
-            {isReprint ? 'Reprinted copy of a self-service kiosk receipt.' : 'Self-service kiosk document. Present with your school ID.'}
+            {type === 'withdrawal_slip' && withdrawal
+              ? withdrawal.status === 'pending'
+                ? 'Present this receipt to the Cashier to claim your cash.'
+                : 'Reprinted copy — this request has already been reviewed.'
+              : isReprint
+                ? 'Reprinted copy of a self-service kiosk receipt.'
+                : 'Self-service kiosk document. Present with your school ID.'}
           </p>
         </div>
 

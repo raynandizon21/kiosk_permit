@@ -1,7 +1,14 @@
 import { pool } from "../config/database.js";
 import { EXAM_TERMS, round2 } from "../utils/helpers.js";
 
-const TERM_KEY = { Prelim: "prelim", Midterm: "midterm", Prefinal: "prefinal", Finals: "finals" };
+const TERM_KEY = {
+  "Long Test Prelim": "longTestPrelim",
+  Prelim: "prelim",
+  "Long Test Midterm": "longTestMidterm",
+  Midterm: "midterm",
+  Prefinal: "prefinal",
+  Finals: "finals",
+};
 
 function groupBy(rows, key) {
   const map = new Map();
@@ -13,8 +20,13 @@ function groupBy(rows, key) {
   return map;
 }
 
-/** Ledger totals + per-term dues. Payments fill the terms in exam order. */
-export function buildLedger(assessment, items, payments) {
+/**
+ * Ledger totals + per-term dues. Payments fill the terms in exam order.
+ * A payment flagged IS_DEPOSIT is held as account credit instead — it does not
+ * count toward totalPaid/dues until the student chooses to apply it, and can
+ * instead be cashed out via a withdrawal_request (see availableCredit below).
+ */
+export function buildLedger(assessment, items, payments, withdrawals = []) {
   const tuitionFee = assessment?.TUITION_FEE ?? 0;
   const laboratoryFee = assessment?.LAB_FEE ?? 0;
   const miscellaneousFee = assessment?.MISC_FEE ?? 0;
@@ -35,14 +47,30 @@ export function buildLedger(assessment, items, payments) {
       otherFees.reduce((s, f) => s + f.amount, 0) -
       discounts.reduce((s, f) => s + f.amount, 0)
   );
-  const totalPaid = round2(payments.reduce((s, p) => s + p.AMOUNT, 0));
+  const duePayments = payments.filter((p) => !p.IS_DEPOSIT);
+  const depositPayments = payments.filter((p) => p.IS_DEPOSIT);
+  const totalPaid = round2(duePayments.reduce((s, p) => s + p.AMOUNT, 0));
   const outstandingBalance = round2(Math.max(0, totalAssessed - totalPaid));
 
-  const termDue = round2(totalAssessed / EXAM_TERMS.length);
+  const totalDeposited = round2(depositPayments.reduce((s, p) => s + p.AMOUNT, 0));
+  const releasedWithdrawals = round2(
+    withdrawals.filter((w) => w.STATUS === "released").reduce((s, w) => s + w.AMOUNT, 0)
+  );
+  const availableCredit = round2(Math.max(0, totalDeposited - releasedWithdrawals));
+
+  // Splitting evenly rarely divides into clean centavos (e.g. ₱26,450 / 6 = ₱4,408.33 with ₱0.02
+  // left over) — round each term down, then let the last term absorb the remainder, so the dues
+  // always add up to exactly totalAssessed instead of a few centavos short.
+  const n = EXAM_TERMS.length;
+  const baseTermDue = Math.floor((totalAssessed / n) * 100) / 100;
+  const lastTermDue = round2(totalAssessed - baseTermDue * (n - 1));
   const termBreakdown = {};
+  let cumulativeDue = 0;
   EXAM_TERMS.forEach((term, i) => {
-    const paid = round2(Math.min(termDue, Math.max(0, totalPaid - termDue * i)));
-    termBreakdown[TERM_KEY[term]] = { due: termDue, paid, cleared: paid >= termDue - 0.01 };
+    const due = i === n - 1 ? lastTermDue : baseTermDue;
+    const paid = round2(Math.min(due, Math.max(0, totalPaid - cumulativeDue)));
+    termBreakdown[TERM_KEY[term]] = { due, paid, cleared: paid >= due - 0.01 };
+    cumulativeDue += due;
   });
 
   return {
@@ -55,6 +83,7 @@ export function buildLedger(assessment, items, payments) {
     totalAssessed,
     totalPaid,
     outstandingBalance,
+    availableCredit,
     termBreakdown,
     payments: payments.map((p) => ({
       id: p.IDNo,
@@ -64,6 +93,7 @@ export function buildLedger(assessment, items, payments) {
       amount: p.AMOUNT,
       paymentMethod: p.PAYMENT_METHOD,
       remarks: p.REMARKS || "",
+      isDeposit: p.IS_DEPOSIT === 1,
     })),
   };
 }
@@ -100,6 +130,10 @@ export async function findProfiles(period, studentId = null) {
     `SELECT * FROM exam_permit x WHERE x.PERIOD_ID = ?${byStudent}`,
     sParams
   );
+  const [withdrawals] = await pool.execute(
+    `SELECT * FROM withdrawal_request x WHERE x.PERIOD_ID = ?${byStudent}`,
+    sParams
+  );
   const [subjects] = await pool.execute(
     `SELECT x.STUDENT_ID, x.INSTRUCTOR, x.SCHEDULE, s.CODE, s.DESCRIPTION, s.UNITS
      FROM student_subject x JOIN subject s ON s.IDNo = x.SUBJECT_ID
@@ -111,6 +145,7 @@ export async function findProfiles(period, studentId = null) {
   const itemsBy = groupBy(items, "STUDENT_ID");
   const paymentsBy = groupBy(payments, "STUDENT_ID");
   const permitsBy = groupBy(permits, "STUDENT_ID");
+  const withdrawalsBy = groupBy(withdrawals, "STUDENT_ID");
   const subjectsBy = groupBy(subjects, "STUDENT_ID");
 
   return students.map((s) => {
@@ -147,7 +182,8 @@ export async function findProfiles(period, studentId = null) {
       ledger: buildLedger(
         assessmentBy.get(s.IDNo),
         itemsBy.get(s.IDNo) ?? [],
-        paymentsBy.get(s.IDNo) ?? []
+        paymentsBy.get(s.IDNo) ?? [],
+        withdrawalsBy.get(s.IDNo) ?? []
       ),
       permits: studentPermits,
       subjects: (subjectsBy.get(s.IDNo) ?? []).map((sub) => ({

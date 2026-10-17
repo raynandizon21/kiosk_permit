@@ -1,4 +1,4 @@
-export const EXAM_TERMS = ["Prelim", "Midterm", "Prefinal", "Finals"];
+export const EXAM_TERMS = ["Long Test Prelim", "Prelim", "Long Test Midterm", "Midterm", "Prefinal", "Finals"];
 
 export const PAYMENT_METHODS = [
   "Cash",
@@ -40,7 +40,14 @@ export function round2(n) {
 
 /** Permit number is unique per student + semester + term. */
 export function permitNumberFor(term, studentId, periodId, kind = "") {
-  const prefix = { Prelim: "PR", Midterm: "MT", Prefinal: "PF", Finals: "FN" }[term] || "EX";
+  const prefix = {
+    "Long Test Prelim": "LP",
+    Prelim: "PR",
+    "Long Test Midterm": "LM",
+    Midterm: "MT",
+    Prefinal: "PF",
+    Finals: "FN",
+  }[term] || "EX";
   const base = `SNC-${prefix}-${periodId}${String(studentId).padStart(4, "0")}`;
   return kind ? `${base}-${kind}` : base;
 }
