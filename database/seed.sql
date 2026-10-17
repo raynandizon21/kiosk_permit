@@ -5,7 +5,7 @@
 USE `kiosk_permit`;
 
 INSERT INTO `user_info` (`FIRST_NAME`, `LAST_NAME`, `POSITION`, `USERNAME`, `PASSWORD`) VALUES
-('Yves', 'Tapnio', 'Admin', 'admin', '$2b$10$ZuidrgJ8NRyIwi0Eq.MiJO8WIojJ.gkuJPPgJb10vfsTwjT4A/D3G');
+('Yves', 'Tapnio', 'Registrar', 'admin', '$2b$10$ZuidrgJ8NRyIwi0Eq.MiJO8WIojJ.gkuJPPgJb10vfsTwjT4A/D3G');
 
 INSERT INTO `academic_period` (`ACADEMIC_YEAR`, `SEMESTER`, `ACTIVE_TERM`, `START_DATE`, `END_DATE`, `IS_CURRENT`) VALUES
 ('2024-2025', '1st Semester', 'Midterm', '2024-08-05', '2024-12-20', 1);

@@ -136,9 +136,8 @@ export const KioskPermitModal: React.FC<KioskPermitModalProps> = ({ onClose, onO
             </tbody>
           </table>
 
-          <div className="mt-8 grid grid-cols-2 gap-6 text-center text-[10px] uppercase tracking-wider text-slate-500">
-            <div className="border-t border-slate-300 pt-1">Office of the Comptroller</div>
-            <div className="border-t border-slate-300 pt-1">College Registrar</div>
+          <div className="mt-8 flex justify-center text-center text-[10px] uppercase tracking-wider text-slate-500">
+            <div className="w-64 border-t border-slate-300 pt-1">Business Office / Registrar</div>
           </div>
         </div>
       )}

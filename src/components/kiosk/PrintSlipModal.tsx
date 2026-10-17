@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckCircle2, Printer } from 'lucide-react';
 import { useApp, TERM_KEY_MAP } from '../../context/AppContext';
 import { playKeyClick } from '../../utils/audio';
-import { formatDate, peso } from '../../utils/format';
+import { formatDate, formatDateTime, peso } from '../../utils/format';
 import { SCHOOL_LOGO } from '../common/CollegeSeal';
 
 const TITLES = {
@@ -27,6 +27,83 @@ export const PrintSlipModal: React.FC = () => {
   const { type, student, term, promissoryNote: note, timestamp, reference, amount, paymentDate, isReprint } = printedSlip;
   const permit = term ? student.permits[TERM_KEY_MAP[term]] : undefined;
 
+  if (type === 'permit' && permit) {
+    return (
+      <div className="fixed inset-0 z-[60] bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div className="w-full max-w-2xl">
+          <div className="printable-area bg-white text-slate-900 rounded-2xl shadow-2xl p-5 sm:p-6 text-xs">
+            <div className="text-center pb-4 border-b border-slate-200">
+              <div className="flex items-center justify-center gap-2">
+                <img src={SCHOOL_LOGO} alt="" className="w-8 h-8 object-contain" />
+                <div className="text-xs font-bold tracking-widest text-snc-green uppercase">
+                  St. Nicolas College of Business and Technology
+                </div>
+              </div>
+              <div className="mt-1 text-base font-bold text-slate-900 uppercase">
+                {term} Examination Permit
+                {isReprint && <span className="ml-1.5 text-[10px] font-bold text-amber-600">(REPRINT)</span>}
+              </div>
+              <div className="text-xs text-slate-500">
+                No. <span className="font-mono-code font-bold text-slate-800">{permit.permitNumber}</span>
+                {permit.status === 'promissory_cleared' && ' • Cleared via promissory note'}
+                {permit.issuedAt && ` • Issued ${formatDateTime(permit.issuedAt)}`}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-b border-slate-200 text-xs">
+              <div><span className="block text-[10px] uppercase text-slate-500">Student</span><span className="font-bold text-slate-900">{student.fullName}</span></div>
+              <div><span className="block text-[10px] uppercase text-slate-500">LRN / ID</span><span className="font-mono-code">{student.lrn}</span><span className="block text-slate-500">{student.studentId}</span></div>
+              <div><span className="block text-[10px] uppercase text-slate-500">Program</span>{student.program}</div>
+              <div><span className="block text-[10px] uppercase text-slate-500">Year & Section</span>{student.yearLevel} • {student.section}</div>
+            </div>
+
+            <table className="w-full text-left text-xs mt-4">
+              <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200">
+                <tr>
+                  <th className="py-2 pr-2">Code</th>
+                  <th className="py-2 pr-2">Subject</th>
+                  <th className="py-2 pr-2 text-center">Units</th>
+                  <th className="py-2 pr-2">Instructor</th>
+                  <th className="py-2 text-center">Proctor Sign</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {student.subjects.map((sub) => (
+                  <tr key={sub.code}>
+                    <td className="py-2 pr-2 font-mono-code font-bold">{sub.code}</td>
+                    <td className="py-2 pr-2">{sub.description}</td>
+                    <td className="py-2 pr-2 text-center">{sub.units}</td>
+                    <td className="py-2 pr-2 text-slate-600">{sub.instructor}</td>
+                    <td className="py-2"><span className="block mx-auto w-20 border-b border-dashed border-slate-300 h-4" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mt-8 flex justify-center text-center text-[10px] uppercase tracking-wider text-slate-500">
+              <div className="w-64 border-t border-slate-300 pt-1">Business Office / Registrar</div>
+            </div>
+          </div>
+
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={() => { playKeyClick(); dismissPrintSlip(); }}
+              className="kiosk-cta flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-white/10 border border-white/30 px-4 py-3 text-xs uppercase text-white hover:bg-white/20 cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4" /> Done
+            </button>
+            <button
+              onClick={() => { playKeyClick(); window.print(); }}
+              className="kiosk-cta flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-3 text-xs uppercase text-black hover:opacity-90 cursor-pointer"
+            >
+              <Printer className="w-4 h-4" /> Print
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[60] bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="w-full max-w-sm">
@@ -43,7 +120,7 @@ export const PrintSlipModal: React.FC = () => {
             <div className="font-bold text-sm">ST. NICOLAS COLLEGE</div>
             <div className="text-[10px] text-slate-500">City of San Fernando, Pampanga</div>
             <div className="pt-1 font-bold uppercase">
-              {type === 'permit' ? `${term} ${TITLES.permit}` : TITLES[type]}
+              {TITLES[type]}
               {isReprint && <span className="ml-1.5 text-[10px] font-bold text-amber-600">(REPRINT)</span>}
             </div>
             <div className="text-[10px] text-slate-500">{timestamp}</div>
@@ -62,18 +139,6 @@ export const PrintSlipModal: React.FC = () => {
               <Line label="Total assessed" value={peso(student.ledger.totalAssessed, true)} />
               <Line label="Total paid" value={peso(student.ledger.totalPaid, true)} />
               <Line label="BALANCE" value={peso(student.ledger.outstandingBalance, true)} strong />
-            </div>
-          )}
-
-          {type === 'permit' && permit && (
-            <div className="space-y-2">
-              <div className="rounded border border-slate-300 p-2 text-center">
-                <span className="block text-[10px] text-slate-500">PERMIT NO.</span>
-                <span className="block font-bold tracking-widest">{permit.permitNumber}</span>
-              </div>
-              {student.subjects.map((sub) => (
-                <Line key={sub.code} label={sub.code} value={`${sub.units}u  ________`} />
-              ))}
             </div>
           )}
 
