@@ -43,6 +43,8 @@ CREATE TABLE `academic_period` (
   `ACADEMIC_YEAR` varchar(20) NOT NULL COMMENT 'e.g. 2024-2025',
   `SEMESTER` varchar(30) NOT NULL COMMENT 'e.g. 1st Semester',
   `ACTIVE_TERM` enum('Prelim','Midterm','Prefinal','Finals') NOT NULL DEFAULT 'Prelim',
+  `START_DATE` date DEFAULT NULL COMMENT 'Semester start, e.g. first day of classes',
+  `END_DATE` date DEFAULT NULL COMMENT 'Semester end, e.g. last day of finals',
   `IS_CURRENT` tinyint(1) NOT NULL DEFAULT 0,
   `ACTIVE` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`IDNo`),
@@ -218,7 +220,7 @@ CREATE TABLE `promissory_note` (
 -- Kiosk + admin activity trail
 CREATE TABLE `audit_log` (
   `IDNo` int(11) NOT NULL AUTO_INCREMENT,
-  `ACTION` varchar(40) NOT NULL COMMENT 'kiosk_login | soa_print | permit_print | promissory_submit | pn_approve | pn_reject | payment | permit_override | term_change',
+  `ACTION` varchar(40) NOT NULL COMMENT 'kiosk_login | soa_print | permit_print | payment_slip_print | promissory_submit | pn_approve | pn_reject | payment | permit_override | term_change',
   `DESCRIPTION` varchar(500) NOT NULL,
   `ACTOR` varchar(120) NOT NULL,
   `STUDENT_ID` int(11) DEFAULT NULL,

@@ -96,21 +96,27 @@
     box-shadow: 0 0 28px rgba(57, 255, 20, 0.18);
   }
 
+  /* White/polka-dot card, same template as the Quick Guide card */
   .kiosk-action-card {
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background:
+      radial-gradient(rgba(0, 77, 0, 0.16) 1.2px, transparent 1.2px) 0 0 / 22px 22px,
+      linear-gradient(160deg, #ffffff 0%, #f4faf5 100%);
+    box-shadow:
+      0 20px 45px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(57, 255, 20, 0.1);
     transition:
       border-color 0.2s ease,
-      background 0.2s ease,
       box-shadow 0.2s ease,
       transform 0.2s ease;
   }
 
   .kiosk-action-card:hover {
-    border-color: rgba(57, 255, 20, 0.45);
-    background: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 0 28px rgba(57, 255, 20, 0.18);
+    border-color: rgba(57, 255, 20, 0.5);
+    box-shadow:
+      0 24px 54px rgba(0, 0, 0, 0.32),
+      0 0 32px rgba(57, 255, 20, 0.22);
     transform: translateY(-2px);
   }
 
@@ -121,9 +127,10 @@
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--color-snc-neon);
+    border: none;
+    background: linear-gradient(135deg, var(--color-snc-green-mid), var(--color-snc-green));
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 77, 0, 0.3);
     transition: transform 0.2s ease;
   }
 
@@ -150,39 +157,39 @@
     box-shadow: 0 0 16px rgba(57, 255, 20, 0.35);
   }
 
-  /* Light text field on dark glass (LRN entry) */
+  /* LRN entry text field — dark text on the white entry card */
   .kiosk-input {
-    border: 1px solid rgba(57, 255, 20, 0.25);
-    background: rgba(4, 20, 8, 0.7);
-    color: #f0fdf4;
+    border: 1.5px solid var(--color-snc-green-mid);
+    background: #ffffff;
+    color: #0f2918;
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
   }
 
   .kiosk-input::placeholder {
-    color: rgba(167, 243, 208, 0.4);
+    color: rgba(15, 41, 24, 0.35);
   }
 
   .kiosk-input:focus {
     outline: none;
-    border-color: rgba(57, 255, 20, 0.6);
-    box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.12);
+    border-color: var(--color-snc-green);
+    box-shadow: 0 0 0 4px rgba(0, 77, 0, 0.18);
   }
 
   .kiosk-key {
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
+    border: 1px solid rgba(0, 77, 0, 0.15);
+    background: #ffffff;
+    color: #0f2918;
     transition: background 0.15s ease, border-color 0.15s ease;
   }
 
   .kiosk-key:hover {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(0, 77, 0, 0.06);
   }
 
   .kiosk-key:active {
-    background: rgba(57, 255, 20, 0.25);
+    background: rgba(57, 255, 20, 0.22);
     border-color: rgba(57, 255, 20, 0.6);
   }
 
@@ -381,18 +388,20 @@
     background: linear-gradient(180deg, rgba(0, 10, 3, 0.75) 0%, rgba(0, 10, 3, 0) 100%);
   }
 
-  /* Sign-in panel styled like a school ID card */
+  /* Student account card: same white/polka-dot template as the Quick Guide card */
   .kiosk-id-card {
-    border: 1px solid rgba(57, 255, 20, 0.35);
-    background: linear-gradient(160deg, rgba(4, 30, 10, 0.88) 0%, rgba(0, 18, 6, 0.92) 100%);
-    backdrop-filter: blur(14px);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background:
+      radial-gradient(rgba(0, 77, 0, 0.16) 1.2px, transparent 1.2px) 0 0 / 22px 22px,
+      linear-gradient(160deg, #ffffff 0%, #f4faf5 100%);
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-      0 0 40px rgba(57, 255, 20, 0.14),
-      0 24px 60px rgba(0, 0, 0, 0.45);
+      0 24px 60px rgba(0, 0, 0, 0.4),
+      0 0 40px rgba(57, 255, 20, 0.1);
   }
   .kiosk-id-card__strip {
-    background: linear-gradient(90deg, #004d00 0%, #1a5c2e 55%, rgba(57, 255, 20, 0.55) 100%);
+    background: linear-gradient(90deg, #0a2e0a 0%, #004d00 60%, #1a5c2e 100%);
+    border-bottom: 1px solid rgba(57, 255, 20, 0.3);
   }
   /* Admin greeting banner */
   .admin-hero {
@@ -428,6 +437,36 @@
     background-color: #061a0a;
   }
 
+  /* Campus photo (70%) + SOA/permit/promissory illustration (30%), blended */
+  .admin-login-brand-photo {
+    opacity: 0.7;
+  }
+  .admin-login-brand-art {
+    opacity: 0.3;
+  }
+
+  .aba-float {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: aba-drift 9s ease-in-out infinite alternate;
+  }
+  .aba-float--slow {
+    animation-duration: 12s;
+  }
+  .aba-float--fast {
+    animation-duration: 7s;
+    animation-delay: -2s;
+  }
+  @keyframes aba-drift {
+    from { transform: translate3d(0, 0, 0) rotate(0deg); }
+    to { transform: translate3d(0, -14px, 0) rotate(1.2deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aba-float {
+      animation: none;
+    }
+  }
+
   .admin-login-brand-glow {
     background:
       radial-gradient(ellipse 80% 60% at 20% 80%, rgba(57, 255, 20, 0.22) 0%, transparent 55%),
@@ -444,21 +483,24 @@
   }
 
   .admin-login-form-panel {
-    background: linear-gradient(165deg, #051408 0%, #0a1f0c 40%, #061a0a 100%);
+    background: linear-gradient(165deg, #ffffff 0%, #f4faf5 100%);
   }
 
   .admin-login-form-dots {
-    background-image: radial-gradient(rgba(57, 255, 20, 0.12) 1px, transparent 1px);
-    background-size: 24px 24px;
-    opacity: 0.35;
+    background-image: radial-gradient(rgba(0, 77, 0, 0.16) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
   }
 
+  /* Sign-in card: same white/polka-dot + green header band as the Quick Guide card */
   .admin-login-card {
-    background: rgba(8, 28, 12, 0.75);
-    backdrop-filter: blur(16px);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background:
+      radial-gradient(rgba(0, 77, 0, 0.16) 1.2px, transparent 1.2px) 0 0 / 22px 22px,
+      linear-gradient(160deg, #ffffff 0%, #f4faf5 100%);
     box-shadow:
-      0 0 0 1px rgba(57, 255, 20, 0.08),
-      0 24px 48px rgba(0, 0, 0, 0.35);
+      0 24px 48px rgba(0, 0, 0, 0.12),
+      0 0 0 1px rgba(0, 77, 0, 0.05);
   }
 
   .admin-login-label {
@@ -468,17 +510,17 @@
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(167, 243, 208, 0.65);
+    color: var(--color-snc-green-mid);
   }
 
   .admin-login-input {
     width: 100%;
     border-radius: 0.75rem;
-    border: 1px solid rgba(57, 255, 20, 0.2);
-    background: rgba(4, 20, 8, 0.8);
+    border: 1.5px solid var(--color-snc-green-mid);
+    background: #ffffff;
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
-    color: #f0fdf4;
+    color: #0f2918;
     outline: none;
     transition:
       border-color 0.2s ease,
@@ -486,25 +528,25 @@
   }
 
   .admin-login-input::placeholder {
-    color: rgba(167, 243, 208, 0.35);
+    color: rgba(15, 41, 24, 0.35);
   }
 
   .admin-login-input:focus {
-    border-color: rgba(57, 255, 20, 0.55);
-    box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.12);
+    border-color: var(--color-snc-green);
+    box-shadow: 0 0 0 3px rgba(0, 77, 0, 0.18);
   }
 
   .admin-login-submit {
-    background: linear-gradient(135deg, #1a7a3a 0%, #39ff14 55%, #2db84a 100%);
+    background: var(--color-snc-green);
     box-shadow:
-      0 4px 20px rgba(57, 255, 20, 0.25),
+      0 4px 20px rgba(0, 77, 0, 0.3),
       0 0 40px rgba(57, 255, 20, 0.08);
   }
 
   .admin-login-submit:hover:not(:disabled) {
-    filter: brightness(1.06);
+    background: var(--color-snc-green-mid);
     box-shadow:
-      0 6px 28px rgba(57, 255, 20, 0.35),
+      0 6px 28px rgba(0, 77, 0, 0.4),
       0 0 48px rgba(57, 255, 20, 0.12);
   }
 

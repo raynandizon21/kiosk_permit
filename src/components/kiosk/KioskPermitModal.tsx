@@ -5,6 +5,7 @@ import { ExamTerm } from '../../types';
 import { playKeyClick } from '../../utils/audio';
 import { formatDateTime, peso } from '../../utils/format';
 import { KioskModal, btnPrimary, btnSecondary } from './KioskModal';
+import { KioskPayBalanceSection } from './KioskPayBalanceSection';
 
 interface KioskPermitModalProps {
   onClose: () => void;
@@ -68,20 +69,27 @@ export const KioskPermitModal: React.FC<KioskPermitModalProps> = ({ onClose, onO
       </div>
 
       {isLocked ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-          <Lock className="w-10 h-10 text-red-600 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-900">{selectedTerm} permit is on hold</h3>
-          <p className="text-sm text-red-700 mt-1">
-            Remaining balance: <strong className="font-mono-code">{peso(ledger.outstandingBalance, true)}</strong>
-          </p>
-          <p className="text-xs text-slate-600 mt-1">Pay at the Cashier, or apply for a promissory note.</p>
-          <button
-            onClick={() => { playKeyClick(); onOpenPromissory(); }}
-            className={`${btnPrimary} mt-5`}
-          >
-            <FileSignature className="w-4 h-4" /> Apply for Promissory Note
-          </button>
-        </div>
+        <>
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+            <Lock className="w-10 h-10 text-red-600 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-slate-900">{selectedTerm} permit is on hold</h3>
+            <p className="text-sm text-red-700 mt-1">
+              Remaining balance: <strong className="font-mono-code">{peso(ledger.outstandingBalance, true)}</strong>
+            </p>
+            <p className="text-xs text-slate-600 mt-1">Pay below, or apply for a promissory note.</p>
+          </div>
+
+          <KioskPayBalanceSection student={activeStudent} />
+
+          <div className="text-center">
+            <button
+              onClick={() => { playKeyClick(); onOpenPromissory(); }}
+              className={btnPrimary}
+            >
+              <FileSignature className="w-4 h-4" /> Apply for Promissory Note Instead
+            </button>
+          </div>
+        </>
       ) : (
         <div className="rounded-2xl border-2 border-slate-200 p-5 sm:p-6">
           <div className="text-center pb-4 border-b border-slate-200">

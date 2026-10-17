@@ -18,3 +18,7 @@ export async function createPayment(data) {
   );
   return result.insertId;
 }
+
+export async function updateOrNumber(id, orNumber) {
+  await pool.execute("UPDATE payment SET OR_NUMBER = ? WHERE IDNo = ?", [orNumber, id]);
+}

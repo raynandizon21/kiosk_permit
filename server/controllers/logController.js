@@ -2,7 +2,7 @@ import * as logModel from "../models/logModel.js";
 import { getErrorMessage } from "../utils/helpers.js";
 
 /** Actions the kiosk itself may record (everything else is logged server-side). */
-const KIOSK_ACTIONS = ["soa_print", "permit_print", "promissory_print"];
+const KIOSK_ACTIONS = ["soa_print", "permit_print", "promissory_print", "payment_slip_print"];
 
 export async function list(req, res) {
   try {

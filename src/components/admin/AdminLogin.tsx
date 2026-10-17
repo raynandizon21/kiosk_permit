@@ -4,6 +4,7 @@ import { LogIn, Eye, EyeOff, FileCheck2, FileSignature, FileText } from 'lucide-
 import { useAuth } from '../../context/AuthContext';
 import { errorMessage } from '../../lib/api';
 import { SCHOOL_LOGO } from '../common/CollegeSeal';
+import { AdminLoginBrandArt } from './AdminLoginBrandArt';
 
 const BUILDING_BG = '/images/uploads/snc-building-front.jpg';
 
@@ -38,9 +39,16 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="admin-login-shell min-h-screen lg:grid lg:grid-cols-2">
+    <div className="admin-login-shell min-h-screen lg:grid lg:grid-cols-[60%_40%]">
       <aside className="admin-login-brand relative hidden lg:flex min-h-screen flex-col justify-between overflow-hidden p-10 xl:p-12">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${BUILDING_BG})` }} aria-hidden />
+        <div
+          className="admin-login-brand-photo absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${BUILDING_BG})` }}
+          aria-hidden
+        />
+        <div className="admin-login-brand-art absolute inset-0">
+          <AdminLoginBrandArt />
+        </div>
         <div className="absolute inset-0 snc-hero-overlay" aria-hidden />
         <div className="admin-login-brand-glow pointer-events-none absolute inset-0" aria-hidden />
 
@@ -78,75 +86,83 @@ export function AdminLogin() {
         <div className="pointer-events-none absolute inset-0 admin-login-form-dots" aria-hidden />
 
         <div className="relative z-10 mx-auto w-full max-w-md">
-          <img src={SCHOOL_LOGO} alt="" className="mb-4 h-14 w-14 object-contain lg:hidden" />
-          <h2 className="text-3xl font-bold tracking-tight text-white">Sign in</h2>
-          <p className="mt-2 text-sm text-emerald-100/60">Accounting and registrar staff only.</p>
-
-          <div className="admin-login-card mt-8 rounded-2xl border border-white/10 p-6 sm:p-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {error && (
-                <div className="rounded-lg border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">{error}</div>
-              )}
-
-              <div>
-                <label htmlFor="username" className="admin-login-label">Username</label>
-                <input
-                  id="username"
-                  type="text"
-                  autoComplete="username"
-                  autoFocus
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="admin-login-input"
-                  placeholder="Enter your username"
-                />
+          <div className="admin-login-card overflow-hidden rounded-2xl">
+            <div className="snc-modal-header flex items-center gap-4 px-7 py-5">
+              <img src={SCHOOL_LOGO} alt="" className="h-12 w-12 shrink-0 object-contain drop-shadow-lg" />
+              <div className="leading-tight">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-snc-neon">Accounting Portal</p>
+                <h2 className="text-xl font-bold text-white">Sign in</h2>
               </div>
+            </div>
 
-              <div>
-                <label htmlFor="password" className="admin-login-label">Password</label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="admin-login-input pr-11"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-200/50 hover:text-white"
-                    tabIndex={-1}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
+            <div className="p-6 sm:p-8">
+              <p className="mb-5 text-sm text-slate-500">Accounting and registrar staff only.</p>
 
-              <label className="flex cursor-pointer select-none items-center gap-2.5">
-                <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4" />
-                <span className="text-sm text-emerald-100/70">Remember me</span>
-              </label>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="admin-login-submit flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold uppercase tracking-wide text-white disabled:opacity-60"
-              >
-                {isSubmitting ? (
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                ) : (
-                  <>
-                    <LogIn className="h-5 w-5" /> Sign in
-                  </>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {error && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
                 )}
-              </button>
-            </form>
+
+                <div>
+                  <label htmlFor="username" className="admin-login-label">Username</label>
+                  <input
+                    id="username"
+                    type="text"
+                    autoComplete="username"
+                    autoFocus
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="admin-login-input"
+                    placeholder="Enter your username"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="admin-login-label">Password</label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="admin-login-input pr-11"
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <label className="flex cursor-pointer select-none items-center gap-2.5">
+                  <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4" />
+                  <span className="text-sm text-slate-600">Remember me</span>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="admin-login-submit flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold uppercase tracking-wide text-white disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <>
+                      <LogIn className="h-5 w-5" /> Sign in
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </main>

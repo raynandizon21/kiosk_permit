@@ -8,7 +8,8 @@ import { SCHOOL_LOGO } from '../common/CollegeSeal';
 const TITLES = {
   soa: 'Statement of Account',
   permit: 'Examination Permit',
-  promissory_receipt: 'Promissory Note Receipt'
+  promissory_receipt: 'Promissory Note Receipt',
+  payment_slip: 'Payment Receipt'
 };
 
 const Line: React.FC<{ label: string; value: React.ReactNode; strong?: boolean }> = ({ label, value, strong }) => (
@@ -23,19 +24,27 @@ export const PrintSlipModal: React.FC = () => {
   const { printedSlip, dismissPrintSlip } = useApp();
   if (!printedSlip) return null;
 
-  const { type, student, term, promissoryNote: note, timestamp } = printedSlip;
+  const { type, student, term, promissoryNote: note, timestamp, reference, amount, paymentDate, isReprint } = printedSlip;
   const permit = term ? student.permits[TERM_KEY_MAP[term]] : undefined;
 
   return (
     <div className="fixed inset-0 z-[60] bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="w-full max-w-sm">
-        <div className="printable-area bg-white text-slate-900 rounded-2xl shadow-2xl p-6 text-xs space-y-4 font-mono-code">
+        <div className="printable-area relative bg-white text-slate-900 rounded-2xl shadow-2xl p-6 text-xs space-y-4 font-mono-code">
+          {type === 'payment_slip' && reference && (
+            <div className="absolute right-6 top-6 text-right">
+              <span className="block text-[9px] uppercase tracking-wide text-slate-400">Invoice Number</span>
+              <span className="block font-bold text-red-600">{reference}</span>
+            </div>
+          )}
+
           <div className="text-center space-y-1 pb-3 border-b border-dashed border-slate-300">
             <img src={SCHOOL_LOGO} alt="" className="w-12 h-12 mx-auto object-contain" />
             <div className="font-bold text-sm">ST. NICOLAS COLLEGE</div>
             <div className="text-[10px] text-slate-500">City of San Fernando, Pampanga</div>
             <div className="pt-1 font-bold uppercase">
               {type === 'permit' ? `${term} ${TITLES.permit}` : TITLES[type]}
+              {isReprint && <span className="ml-1.5 text-[10px] font-bold text-amber-600">(REPRINT)</span>}
             </div>
             <div className="text-[10px] text-slate-500">{timestamp}</div>
           </div>
@@ -78,8 +87,18 @@ export const PrintSlipModal: React.FC = () => {
             </div>
           )}
 
+          {type === 'payment_slip' && (
+            <div className="space-y-2">
+              <Line label="Amount paid" value={peso(amount ?? 0, true)} strong />
+              <Line label="Mode of payment" value="Cash" />
+              {paymentDate && <Line label="Paid on" value={formatDate(paymentDate)} />}
+              <Line label="Current balance" value={peso(student.ledger.outstandingBalance, true)} />
+              <Line label="Status" value="PAID" />
+            </div>
+          )}
+
           <p className="pt-3 border-t border-dashed border-slate-300 text-center text-[10px] text-slate-500">
-            Self-service kiosk document. Present with your school ID.
+            {isReprint ? 'Reprinted copy of a self-service kiosk receipt.' : 'Self-service kiosk document. Present with your school ID.'}
           </p>
         </div>
 

@@ -32,7 +32,13 @@ const TYPES = {
   periods: {
     table: "academic_period",
     label: "school year / semester",
-    fields: { academic_year: "ACADEMIC_YEAR", semester: "SEMESTER", active_term: "ACTIVE_TERM" },
+    fields: {
+      academic_year: "ACADEMIC_YEAR",
+      semester: "SEMESTER",
+      active_term: "ACTIVE_TERM",
+      start_date: "START_DATE",
+      end_date: "END_DATE",
+    },
     extra: ["IS_CURRENT AS is_current"],
     required: ["academic_year", "semester", "active_term"],
     order: "ACADEMIC_YEAR DESC, SEMESTER DESC",
@@ -81,6 +87,12 @@ export function cleanInput(type, body, { isCreate }) {
   if (type === "periods") {
     if (!/^\d{4}-\d{4}$/.test(data.academic_year)) throw new Error("School year must look like 2024-2025");
     if (!EXAM_TERMS.includes(data.active_term)) throw new Error("Invalid examination term");
+    const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+    if (data.start_date && !dateRe.test(data.start_date)) throw new Error("Invalid start date");
+    if (data.end_date && !dateRe.test(data.end_date)) throw new Error("Invalid end date");
+    if (data.start_date && data.end_date && data.end_date < data.start_date) {
+      throw new Error("End date must be on or after the start date");
+    }
   }
   if (type === "users") {
     const password = String(body.password ?? "");

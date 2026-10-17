@@ -1,5 +1,6 @@
 import * as fileMaintenanceModel from "../models/fileMaintenanceModel.js";
 import * as logModel from "../models/logModel.js";
+import * as periodModel from "../models/periodModel.js";
 import { findUserName } from "../models/authModel.js";
 import { encodedBy, getErrorMessage, isDuplicateKeyError } from "../utils/helpers.js";
 
@@ -20,7 +21,9 @@ async function log(req, description) {
 
 export async function list(req, res) {
   try {
-    res.json(await fileMaintenanceModel.findAll(req.params.type));
+    const { type } = req.params;
+    if (type === "periods") await periodModel.syncCurrentPeriodByDate();
+    res.json(await fileMaintenanceModel.findAll(type));
   } catch (error) {
     res.status(400).json({ error: getErrorMessage(error) });
   }

@@ -15,6 +15,7 @@ import {
   UserCog,
   UserPlus,
   UserX,
+  Wallet,
   XCircle
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -28,6 +29,7 @@ const ACTIONS: Record<string, ActionUi> = {
   soa_print: { label: 'SOA printed', icon: Printer, tone: 'gray', group: 'kiosk' },
   permit_print: { label: 'Permit printed', icon: Printer, tone: 'gray', group: 'kiosk' },
   promissory_print: { label: 'PN receipt printed', icon: Printer, tone: 'gray', group: 'kiosk' },
+  payment_slip_print: { label: 'Order of payment printed', icon: Wallet, tone: 'amber', group: 'kiosk' },
   promissory_submit: { label: 'PN submitted', icon: FileSignature, tone: 'amber', group: 'kiosk' },
   pn_approve: { label: 'PN approved', icon: CheckCircle2, tone: 'green', group: 'accounting' },
   pn_reject: { label: 'PN declined', icon: XCircle, tone: 'red', group: 'accounting' },

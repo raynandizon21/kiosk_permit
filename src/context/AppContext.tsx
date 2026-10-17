@@ -4,6 +4,7 @@ import {
   AuditLog,
   ExamTerm,
   PaymentMethod,
+  PaymentRecord,
   PermitStatus,
   PrintedSlip,
   PromissoryNote,
@@ -14,6 +15,7 @@ import {
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from './AuthContext';
 import { playPrinterSound, playSuccessChime } from '../utils/audio';
+import { peso } from '../utils/format';
 
 export const TERM_KEY_MAP: Record<ExamTerm, TermKey> = {
   Prelim: 'prelim',
@@ -57,8 +59,9 @@ interface AppContextType {
   loginKiosk: (lookup: string) => Promise<{ success: boolean; message?: string }>;
   logoutKiosk: () => void;
   submitPromissoryNote: (input: PromissoryInput) => Promise<{ note?: PromissoryNote; message?: string }>;
+  payBalance: (amount: number) => Promise<{ message?: string }>;
   printedSlip: PrintedSlip | null;
-  triggerPrint: (type: PrintedSlip['type'], student: Student, term?: ExamTerm, note?: PromissoryNote) => void;
+  triggerPrint: (type: PrintedSlip['type'], student: Student, term?: ExamTerm, note?: PromissoryNote, payment?: PaymentRecord, isReprint?: boolean) => void;
   dismissPrintSlip: () => void;
 
   // Admin
@@ -103,7 +106,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const PRINT_LOG: Record<PrintedSlip['type'], string> = {
   soa: 'soa_print',
   permit: 'permit_print',
-  promissory_receipt: 'promissory_print'
+  promissory_receipt: 'promissory_print',
+  payment_slip: 'payment_slip_print'
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -158,19 +162,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setPrintedSlip(null);
   }, []);
 
-  const triggerPrint: AppContextType['triggerPrint'] = (type, student, term, note) => {
+  const triggerPrint: AppContextType['triggerPrint'] = (type, student, term, note, payment, isReprint) => {
     playPrinterSound();
+    const now = Date.now();
     setPrintedSlip({
       type,
       student,
       term,
       promissoryNote: note,
-      timestamp: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+      timestamp: new Date(now).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+      reference: type === 'payment_slip' ? payment?.orNumber : undefined,
+      amount: type === 'payment_slip' ? payment?.amount : undefined,
+      paymentDate: type === 'payment_slip' ? payment?.date : undefined,
+      isReprint: type === 'payment_slip' ? isReprint : undefined
     });
-    const what = type === 'permit' ? `${term} examination permit` : type === 'soa' ? 'statement of account' : `promissory note receipt ${note?.referenceNo ?? ''}`;
+    const what =
+      type === 'permit'
+        ? `${term} examination permit`
+        : type === 'soa'
+          ? 'statement of account'
+          : type === 'payment_slip'
+            ? `payment receipt ${payment?.orNumber ?? ''} (cash, ${peso(payment?.amount ?? 0, true)})`
+            : `promissory note receipt ${note?.referenceNo ?? ''}`;
     api('/api/logs', {
       method: 'POST',
-      body: { action: PRINT_LOG[type], description: `Printed ${what}`, student_id: student.id }
+      body: { action: PRINT_LOG[type], description: `${isReprint ? 'Reprinted' : 'Printed'} ${what}`, student_id: student.id }
     }).catch(() => undefined);
   };
 
@@ -194,6 +210,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await loadStudentNotes(activeStudent.id);
       triggerPrint('promissory_receipt', activeStudent, input.term, note);
       return { note };
+    } catch (err) {
+      return { message: errorMessage(err) };
+    }
+  };
+
+  /** Self-service cash payment: posts straight to the ledger (see server kioskCreate), then prints the receipt. */
+  const payBalance = async (amount: number) => {
+    if (!activeStudent) return { message: 'Session expired. Please sign in again.' };
+    try {
+      const updated = await api<Student>('/api/payments/kiosk', {
+        method: 'POST',
+        body: { student_id: activeStudent.id, amount }
+      });
+      setActiveStudent(updated);
+      // payments are ordered newest-first, so index 0 is the one that was just posted
+      triggerPrint('payment_slip', updated, undefined, undefined, updated.ledger.payments[0]);
+      return {};
     } catch (err) {
       return { message: errorMessage(err) };
     }
@@ -332,6 +365,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loginKiosk,
         logoutKiosk,
         submitPromissoryNote,
+        payBalance,
         printedSlip,
         triggerPrint,
         dismissPrintSlip: () => setPrintedSlip(null),

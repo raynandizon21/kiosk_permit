@@ -19,7 +19,7 @@ export interface Field {
   key: string;
   label: string;
   /** 'checkboxes' = multi-select; the value is a comma-separated list of option values. */
-  type?: 'text' | 'number' | 'select' | 'password' | 'checkboxes';
+  type?: 'text' | 'number' | 'select' | 'password' | 'checkboxes' | 'date';
   options?: FieldOption[];
   /** Custom table cell text (e.g. show a course code instead of its id). */
   display?: (row: Row) => string;
@@ -268,7 +268,7 @@ export const MaintenancePanel: React.FC<MaintenancePanelProps> = ({
                   </select>
                 ) : (
                   <input
-                    type={f.type === 'number' ? 'number' : f.type === 'password' ? 'password' : 'text'}
+                    type={f.type === 'number' ? 'number' : f.type === 'password' ? 'password' : f.type === 'date' ? 'date' : 'text'}
                     step={f.type === 'number' ? '0.5' : undefined}
                     value={form[f.key]}
                     onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}

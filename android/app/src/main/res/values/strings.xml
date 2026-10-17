@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SNC Permit Kiosk</string>
+    <string name="title_activity_main">SNC Permit Kiosk</string>
+    <string name="package_name">ph.edu.snc.permitkiosk</string>
+    <string name="custom_url_scheme">ph.edu.snc.permitkiosk</string>
+</resources>

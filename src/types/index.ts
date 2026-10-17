@@ -138,9 +138,17 @@ export interface AuditLog {
 }
 
 export interface PrintedSlip {
-  type: 'soa' | 'permit' | 'promissory_receipt';
+  type: 'soa' | 'permit' | 'promissory_receipt' | 'payment_slip';
   student: Student;
   term?: ExamTerm;
   promissoryNote?: PromissoryNote;
   timestamp: string;
+  /** O.R. number of the cash payment this receipt is for (payment_slip only) — same one listed under Payments on the SOA. */
+  reference?: string;
+  /** Amount paid (payment_slip only). */
+  amount?: number;
+  /** Date the payment was recorded (payment_slip only); lets a past payment be reprinted with its original date, not today's. */
+  paymentDate?: string;
+  /** True when this is a reprint of a past payment from the Payments list, not the receipt for a payment just made. */
+  isReprint?: boolean;
 }

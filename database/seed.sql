@@ -5,10 +5,10 @@
 USE `kiosk_permit`;
 
 INSERT INTO `user_info` (`FIRST_NAME`, `LAST_NAME`, `POSITION`, `USERNAME`, `PASSWORD`) VALUES
-('Teresa', 'Mendoza', 'Comptroller', 'admin', '$2b$10$ZuidrgJ8NRyIwi0Eq.MiJO8WIojJ.gkuJPPgJb10vfsTwjT4A/D3G');
+('Yves', 'Tapnio', 'Admin', 'admin', '$2b$10$ZuidrgJ8NRyIwi0Eq.MiJO8WIojJ.gkuJPPgJb10vfsTwjT4A/D3G');
 
-INSERT INTO `academic_period` (`ACADEMIC_YEAR`, `SEMESTER`, `ACTIVE_TERM`, `IS_CURRENT`) VALUES
-('2024-2025', '1st Semester', 'Midterm', 1);
+INSERT INTO `academic_period` (`ACADEMIC_YEAR`, `SEMESTER`, `ACTIVE_TERM`, `START_DATE`, `END_DATE`, `IS_CURRENT`) VALUES
+('2024-2025', '1st Semester', 'Midterm', '2024-08-05', '2024-12-20', 1);
 
 INSERT INTO `course` (`CODE`, `NAME`, `DEPARTMENT`) VALUES
 ('BSIT', 'BS Information Technology', 'College of Computer Studies'),
@@ -40,9 +40,9 @@ INSERT INTO `subject` (`CODE`, `DESCRIPTION`, `UNITS`) VALUES
 ('HM-403', 'Events Management and Catering Operations', 3),
 ('HM-404', 'Practicum and Internship Seminar', 3);
 
--- Juan Miguel Dela Cruz
+-- Darlyn Jhane
 INSERT INTO `student` (`IDNo`, `LRN`, `STUDENT_NUMBER`, `FIRSTNAME`, `LASTNAME`, `COURSE`, `DEPARTMENT`, `YEAR_LEVEL`, `SECTION`, `CONTACTNo`, `EMAIL`, `GUARDIAN_NAME`, `GUARDIAN_CONTACT`, `ADDRESS`, `ENCODED_BY`) VALUES
-(1, '109283746501', 'SNC-2023-0104', 'Juan Miguel', 'Dela Cruz', 'BS Information Technology', 'College of Computer Studies', '3rd Year', 'BSIT 3-A', '0917-829-4501', 'jmdelacruz@snc.edu.ph', 'Eduardo Dela Cruz', '0918-554-1234', 'Brgy. Dolores, City of San Fernando, Pampanga', 1);
+(1, '109283746501', 'SNC-2023-0104', 'Darlyn', 'Jhane', 'BS Information Technology', 'College of Computer Studies', '3rd Year', 'BSIT 3-A', '0917-829-4501', 'djhane@snc.edu.ph', 'Eduardo Jhane', '0918-554-1234', 'Brgy. Dolores, City of San Fernando, Pampanga', 1);
 INSERT INTO `assessment` (`IDNo`, `STUDENT_ID`, `PERIOD_ID`, `TUITION_FEE`, `LAB_FEE`, `MISC_FEE`, `PREVIOUS_BALANCE`, `ENCODED_BY`) VALUES (1, 1, 1, 16500, 4200, 3800, 0, 1);
 INSERT INTO `assessment_item` (`ASSESSMENT_ID`, `ITEM_NAME`, `AMOUNT`, `ITEM_TYPE`) VALUES
 (1, 'Computer Lab / Internet Fee', 1500, 'fee'),
@@ -57,9 +57,9 @@ INSERT INTO `student_subject` (`STUDENT_ID`, `PERIOD_ID`, `SUBJECT_ID`, `INSTRUC
 (1, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'IT-314'), 'Prof. Christian Pineda', 'TTH 01:00 - 02:30 PM (ComLab 1)'),
 (1, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'GE-08'), 'Dr. Maria Elena Castro', 'F 09:00 - 12:00 PM (AVR 1)');
 
--- Maria Clarisse Santos
+-- Angelica Mamangun
 INSERT INTO `student` (`IDNo`, `LRN`, `STUDENT_NUMBER`, `FIRSTNAME`, `LASTNAME`, `COURSE`, `DEPARTMENT`, `YEAR_LEVEL`, `SECTION`, `CONTACTNo`, `EMAIL`, `GUARDIAN_NAME`, `GUARDIAN_CONTACT`, `ADDRESS`, `ENCODED_BY`) VALUES
-(2, '109283746502', 'SNC-2023-0245', 'Maria Clarisse', 'Santos', 'BS Business Administration', 'College of Business and Accountancy', '2nd Year', 'BSBA 2-B', '0920-412-9844', 'mcsantos@snc.edu.ph', 'Luzviminda Santos', '0919-876-5432', 'Sindalan, City of San Fernando, Pampanga', 1);
+(2, '109283746502', 'SNC-2023-0245', 'Angelica', 'Mamangun', 'BS Business Administration', 'College of Business and Accountancy', '2nd Year', 'BSBA 2-B', '0920-412-9844', 'amamangun@snc.edu.ph', 'Luzviminda Mamangun', '0919-876-5432', 'Sindalan, City of San Fernando, Pampanga', 1);
 INSERT INTO `assessment` (`IDNo`, `STUDENT_ID`, `PERIOD_ID`, `TUITION_FEE`, `LAB_FEE`, `MISC_FEE`, `PREVIOUS_BALANCE`, `ENCODED_BY`) VALUES (2, 2, 1, 14500, 1200, 3600, 1200, 1);
 INSERT INTO `assessment_item` (`ASSESSMENT_ID`, `ITEM_NAME`, `AMOUNT`, `ITEM_TYPE`) VALUES
 (2, 'Business Lab Simulation', 800, 'fee'),
@@ -71,9 +71,9 @@ INSERT INTO `student_subject` (`STUDENT_ID`, `PERIOD_ID`, `SUBJECT_ID`, `INSTRUC
 (2, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'BA-203'), 'Dr. Ramon Bautista', 'TTH 01:00 - 02:30 PM (Room 203)'),
 (2, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'GE-05'), 'Prof. Mary Ann Cruz', 'MW 01:00 - 02:30 PM (Room 105)');
 
--- Mark Anthony Bautista
+-- Rio Feliciano
 INSERT INTO `student` (`IDNo`, `LRN`, `STUDENT_NUMBER`, `FIRSTNAME`, `LASTNAME`, `COURSE`, `DEPARTMENT`, `YEAR_LEVEL`, `SECTION`, `CONTACTNo`, `EMAIL`, `GUARDIAN_NAME`, `GUARDIAN_CONTACT`, `ADDRESS`, `ENCODED_BY`) VALUES
-(3, '109283746503', 'SNC-2024-0089', 'Mark Anthony', 'Bautista', 'BS Criminology', 'College of Criminal Justice Education', '1st Year', 'BSCrim 1-C', '0945-312-7788', 'mabautista@snc.edu.ph', 'Rolando Bautista', '0930-112-9988', 'San Agustin, San Fernando, Pampanga', 1);
+(3, '109283746503', 'SNC-2024-0089', 'Rio', 'Feliciano', 'BS Criminology', 'College of Criminal Justice Education', '1st Year', 'BSCrim 1-C', '0945-312-7788', 'rfeliciano@snc.edu.ph', 'Rolando Feliciano', '0930-112-9988', 'San Agustin, San Fernando, Pampanga', 1);
 INSERT INTO `assessment` (`IDNo`, `STUDENT_ID`, `PERIOD_ID`, `TUITION_FEE`, `LAB_FEE`, `MISC_FEE`, `PREVIOUS_BALANCE`, `ENCODED_BY`) VALUES (3, 3, 1, 15800, 3500, 3900, 0, 1);
 INSERT INTO `assessment_item` (`ASSESSMENT_ID`, `ITEM_NAME`, `AMOUNT`, `ITEM_TYPE`) VALUES
 (3, 'Criminology Uniform / Badge Fee', 1800, 'fee'),
@@ -85,9 +85,9 @@ INSERT INTO `student_subject` (`STUDENT_ID`, `PERIOD_ID`, `SUBJECT_ID`, `INSTRUC
 (3, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'PE-101'), 'Coach Dante Mallari', 'Sat 08:00 - 10:00 AM (Gymnasium)'),
 (3, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'GE-01'), 'Prof. Rowena Tolentino', 'MWF 10:30 - 11:30 AM (Room 104)');
 
--- Sophia Andrea Reyes
+-- Yves Tapnio
 INSERT INTO `student` (`IDNo`, `LRN`, `STUDENT_NUMBER`, `FIRSTNAME`, `LASTNAME`, `COURSE`, `DEPARTMENT`, `YEAR_LEVEL`, `SECTION`, `CONTACTNo`, `EMAIL`, `GUARDIAN_NAME`, `GUARDIAN_CONTACT`, `ADDRESS`, `ENCODED_BY`) VALUES
-(4, '109283746504', 'SNC-SHS-2023-091', 'Sophia Andrea', 'Reyes', 'Senior High School - STEM Strand', 'Basic Education Department', 'Grade 12', 'STEM 12-A', '0915-778-9012', 'sareyes@snc.edu.ph', 'Marilou Reyes', '0922-345-6789', 'Telabastagan, City of San Fernando, Pampanga', 1);
+(4, '109283746504', 'SNC-SHS-2023-091', 'Yves', 'Tapnio', 'Senior High School - STEM Strand', 'Basic Education Department', 'Grade 12', 'STEM 12-A', '0915-778-9012', 'ytapnio@snc.edu.ph', 'Marilou Tapnio', '0922-345-6789', 'Telabastagan, City of San Fernando, Pampanga', 1);
 INSERT INTO `assessment` (`IDNo`, `STUDENT_ID`, `PERIOD_ID`, `TUITION_FEE`, `LAB_FEE`, `MISC_FEE`, `PREVIOUS_BALANCE`, `ENCODED_BY`) VALUES (4, 4, 1, 11000, 2400, 2800, 0, 1);
 INSERT INTO `assessment_item` (`ASSESSMENT_ID`, `ITEM_NAME`, `AMOUNT`, `ITEM_TYPE`) VALUES
 (4, 'DepEd Voucher Subsidy Applied', 0, 'fee'),
@@ -99,20 +99,6 @@ INSERT INTO `student_subject` (`STUDENT_ID`, `PERIOD_ID`, `SUBJECT_ID`, `INSTRUC
 (4, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'STEM-122'), 'Maam Jennifer David', 'TTH 10:00 - 12:00 PM (SciLab 2)'),
 (4, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'STEM-123'), 'Sir Michael Ocampo', 'MWF 01:00 - 02:00 PM (Room 402)'),
 (4, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'COR-09'), 'Coach Alvin Bondoc', 'Sat 09:00 - 11:00 AM (Quadrangle)');
-
--- Joshua Paolo Lim
-INSERT INTO `student` (`IDNo`, `LRN`, `STUDENT_NUMBER`, `FIRSTNAME`, `LASTNAME`, `COURSE`, `DEPARTMENT`, `YEAR_LEVEL`, `SECTION`, `CONTACTNo`, `EMAIL`, `GUARDIAN_NAME`, `GUARDIAN_CONTACT`, `ADDRESS`, `ENCODED_BY`) VALUES
-(5, '109283746505', 'SNC-2022-0411', 'Joshua Paolo', 'Lim', 'BS Hospitality Management', 'College of International Hospitality Management', '4th Year', 'BSHM 4-A', '0918-294-8172', 'jplim@snc.edu.ph', 'Vicente Lim', '0917-334-9021', 'Maimpis, City of San Fernando, Pampanga', 1);
-INSERT INTO `assessment` (`IDNo`, `STUDENT_ID`, `PERIOD_ID`, `TUITION_FEE`, `LAB_FEE`, `MISC_FEE`, `PREVIOUS_BALANCE`, `ENCODED_BY`) VALUES (5, 5, 1, 17200, 5800, 4100, 0, 1);
-INSERT INTO `assessment_item` (`ASSESSMENT_ID`, `ITEM_NAME`, `AMOUNT`, `ITEM_TYPE`) VALUES
-(5, 'Commercial Kitchen Consumables', 2200, 'fee'),
-(5, 'Food & Beverage Service Assessment', 1500, 'fee'),
-(5, 'Graduation & Yearbook Deposit', 1200, 'fee');
-INSERT INTO `student_subject` (`STUDENT_ID`, `PERIOD_ID`, `SUBJECT_ID`, `INSTRUCTOR`, `SCHEDULE`) VALUES
-(5, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'HM-401'), 'Chef Roderick Baluyut', 'M 08:00 - 01:00 PM (Hot Kitchen)'),
-(5, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'HM-402'), 'Prof. Cecille Dantes', 'TTH 09:00 - 10:30 AM (Mock Hotel)'),
-(5, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'HM-403'), 'Prof. Melissa Galang', 'W 01:00 - 05:00 PM (Banquet Hall)'),
-(5, 1, (SELECT `IDNo` FROM `subject` WHERE `CODE` = 'HM-404'), 'Dean Alejandro David', 'F 02:00 - 05:00 PM (AVR 2)');
 
 -- Link subjects to courses (GE subjects have no link = all courses)
 INSERT INTO `subject_course` (`SUBJECT_ID`, `COURSE_ID`)

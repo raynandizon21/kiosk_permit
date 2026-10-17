@@ -15,7 +15,7 @@ export const KioskLrnInput: React.FC = () => {
   const [step, setStep] = useState<'welcome' | 'entry'>('welcome');
   const [value, setValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showKeypad, setShowKeypad] = useState(false);
+  const [showKeypad, setShowKeypad] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +23,7 @@ export const KioskLrnInput: React.FC = () => {
     setStep('welcome');
     setValue('');
     setErrorMessage('');
-    setShowKeypad(false);
+    setShowKeypad(true);
   };
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export const KioskLrnInput: React.FC = () => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="w-full kiosk-glass kiosk-glass-neon rounded-2xl p-4 sm:p-6 space-y-4 text-left"
+        className="kiosk-guide-glass w-full rounded-2xl p-4 sm:p-6 space-y-4 text-left"
       >
         <div className="relative flex items-center">
           <label htmlFor="student-input" className="sr-only">Student Number or LRN</label>
@@ -126,27 +126,27 @@ export const KioskLrnInput: React.FC = () => {
           <button
             type="submit"
             disabled={isVerifying}
-            className="kiosk-cta absolute right-2 h-12 px-6 rounded-full bg-white text-black uppercase flex items-center gap-1.5 shadow-lg transition-opacity hover:opacity-90 active:scale-95 disabled:opacity-60 cursor-pointer"
+            className="kiosk-cta absolute right-2 h-12 px-6 rounded-full bg-snc-green hover:bg-snc-green-mid text-white uppercase flex items-center gap-1.5 shadow-lg transition-colors active:scale-95 disabled:opacity-60 cursor-pointer"
           >
             {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Enter <ArrowRight className="w-4 h-4" /></>}
           </button>
         </div>
 
         {errorMessage && (
-          <div className="text-red-100 text-sm flex items-center gap-2 bg-red-950/60 border border-red-500/45 py-2.5 px-4 rounded-xl">
+          <div className="text-red-600 text-sm flex items-center gap-2 bg-red-50 border border-red-200 py-2.5 px-4 rounded-xl">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        <div className="flex items-center justify-between text-xs text-white/75">
+        <div className="flex items-center justify-between text-xs text-slate-500">
           <button
             type="button"
             onClick={() => {
               playKeyClick();
               backToWelcome();
             }}
-            className="flex items-center gap-1.5 py-1 font-medium hover:text-white cursor-pointer"
+            className="flex items-center gap-1.5 py-1 font-medium hover:text-slate-900 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
@@ -156,27 +156,27 @@ export const KioskLrnInput: React.FC = () => {
               playKeyClick();
               setShowKeypad((prev) => !prev);
             }}
-            className="flex items-center gap-1.5 py-1 font-medium hover:text-white cursor-pointer"
+            className="flex items-center gap-1.5 py-1 font-medium hover:text-slate-900 cursor-pointer"
           >
-            <Keyboard className="w-4 h-4 text-snc-neon" />
+            <Keyboard className="w-4 h-4 text-snc-green-mid" />
             {showKeypad ? 'Hide keypad' : 'Use touch keypad'}
           </button>
         </div>
 
         {showKeypad && (
-          <div className="grid grid-cols-3 gap-2 p-3 bg-black/25 border border-white/15 rounded-2xl max-w-xs mx-auto">
+          <div className="grid grid-cols-3 gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
             {KEYS.map((digit) => (
-              <button key={digit} type="button" onClick={() => press(value + digit)} className="kiosk-key h-14 rounded-xl font-mono-code font-bold text-xl cursor-pointer">
+              <button key={digit} type="button" onClick={() => press(value + digit)} className="kiosk-key h-16 rounded-xl font-mono-code font-bold text-2xl cursor-pointer">
                 {digit}
               </button>
             ))}
-            <button type="button" onClick={() => press(value.slice(0, -1))} aria-label="Backspace" className="kiosk-key h-14 rounded-xl flex items-center justify-center cursor-pointer">
-              <Delete className="w-5 h-5" />
+            <button type="button" onClick={() => press(value.slice(0, -1))} aria-label="Backspace" className="kiosk-key h-16 rounded-xl flex items-center justify-center cursor-pointer">
+              <Delete className="w-6 h-6" />
             </button>
-            <button type="button" onClick={() => press(value + '0')} className="kiosk-key h-14 rounded-xl font-mono-code font-bold text-xl cursor-pointer">
+            <button type="button" onClick={() => press(value + '0')} className="kiosk-key h-16 rounded-xl font-mono-code font-bold text-2xl cursor-pointer">
               0
             </button>
-            <button type="button" onClick={() => press('')} className="kiosk-key h-14 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer">
+            <button type="button" onClick={() => press('')} className="kiosk-key h-16 rounded-xl text-sm font-bold uppercase tracking-wider cursor-pointer">
               Clear
             </button>
           </div>

@@ -3,8 +3,9 @@ import { CheckCircle2 } from 'lucide-react';
 import { api } from '../../../lib/api';
 import { useAuth } from '../../../context/AuthContext';
 import { ALL_EXAM_TERMS } from '../../../context/AppContext';
-import { MaintenancePanel } from './MaintenancePanel';
+import { MaintenancePanel, Row } from './MaintenancePanel';
 import { StatusPill } from '../AdminPageParts';
+import { formatDate } from '../../../utils/format';
 
 export const AdminCourses: React.FC = () => (
   <MaintenancePanel
@@ -69,7 +70,19 @@ export const AdminPeriods: React.FC = () => {
       fields={[
         { key: 'academic_year', label: 'School year', required: true, placeholder: '2025-2026', mono: true },
         { key: 'semester', label: 'Semester', type: 'select', options: SEMESTERS, required: true },
-        { key: 'active_term', label: 'Exam term', type: 'select', options: ALL_EXAM_TERMS, required: true }
+        { key: 'active_term', label: 'Exam term', type: 'select', options: ALL_EXAM_TERMS, required: true },
+        {
+          key: 'start_date',
+          label: 'From',
+          type: 'date',
+          display: (row: Row) => (row.start_date ? formatDate(String(row.start_date)) : '—')
+        },
+        {
+          key: 'end_date',
+          label: 'To',
+          type: 'date',
+          display: (row: Row) => (row.end_date ? formatDate(String(row.end_date)) : '—')
+        }
       ]}
       extraHeader="Period"
       renderExtra={(row) =>

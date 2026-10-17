@@ -17,10 +17,10 @@ import { StudentAvatar } from '../common/StudentAvatar';
 type Modal = 'soa' | 'permit' | 'promissory' | null;
 
 const CHIP = {
-  ok: 'text-emerald-50 bg-emerald-950/75 border-emerald-500/45',
-  warn: 'text-amber-50 bg-amber-950/70 border-amber-400/45',
-  bad: 'text-red-50 bg-red-950/80 border-red-500/45',
-  neutral: 'text-white/80 bg-white/10 border-white/20'
+  ok: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+  warn: 'text-amber-600 bg-amber-50 border-amber-200',
+  bad: 'text-red-600 bg-red-50 border-red-200',
+  neutral: 'text-slate-600 bg-slate-100 border-slate-200'
 };
 
 export const KioskStudentDashboard: React.FC = () => {
@@ -85,22 +85,22 @@ export const KioskStudentDashboard: React.FC = () => {
           <div className="flex min-w-0 flex-1 items-center gap-4">
             <StudentAvatar name={fullName} className="kiosk-avatar-ring h-16 w-16 text-xl" />
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/75">Hello,</p>
-              <h1 className="truncate text-2xl font-bold text-white">{activeStudent.firstName}!</h1>
-              <p className="truncate text-xs text-white/70">
-                <span className="font-medium text-emerald-300">{program}</span> · {yearLevel} ({section}) · <span className="font-mono-code">LRN {lrn}</span>
+              <p className="text-xs uppercase tracking-[0.2em] text-snc-green-mid">Hello,</p>
+              <h1 className="truncate text-2xl font-bold text-slate-900">{activeStudent.firstName}!</h1>
+              <p className="truncate text-xs text-slate-500">
+                <span className="font-medium text-snc-green-mid">{program}</span> · {yearLevel} ({section}) · <span className="font-mono-code">LRN {lrn}</span>
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 lg:w-80">
-            <div className="rounded-2xl border border-white/15 bg-black/25 px-4 py-3">
-              <div className="text-[10px] uppercase tracking-wider text-white/55">Balance</div>
-              <div className={`font-mono-code text-lg font-bold ${hasBalance ? 'text-amber-200' : 'text-snc-neon'}`}>{peso(ledger.outstandingBalance)}</div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="text-[10px] uppercase tracking-wider text-slate-500">Balance</div>
+              <div className={`font-mono-code text-lg font-bold ${hasBalance ? 'text-amber-600' : 'text-snc-green-mid'}`}>{peso(ledger.outstandingBalance)}</div>
             </div>
-            <div className="rounded-2xl border border-white/15 bg-black/25 px-4 py-3">
-              <div className="text-[10px] uppercase tracking-wider text-white/55">{currentExamTerm} permit</div>
-              <div className={`text-sm font-bold ${permitStatus === 'locked' ? 'text-red-300' : permitStatus === 'cleared' ? 'text-snc-neon' : 'text-amber-200'}`}>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="text-[10px] uppercase tracking-wider text-slate-500">{currentExamTerm} permit</div>
+              <div className={`text-sm font-bold ${permitStatus === 'locked' ? 'text-red-600' : permitStatus === 'cleared' ? 'text-snc-green-mid' : 'text-amber-600'}`}>
                 {permitStatus === 'locked' ? 'On hold' : permitStatus === 'cleared' ? 'Cleared' : 'Cleared (PN)'}
               </div>
             </div>
@@ -111,7 +111,7 @@ export const KioskStudentDashboard: React.FC = () => {
               playKeyClick();
               logoutKiosk();
             }}
-            className="kiosk-cta flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-5 py-3 text-[11px] uppercase text-white transition-colors hover:bg-white/20 cursor-pointer"
+            className="kiosk-cta flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-5 py-3 text-[11px] uppercase text-slate-700 transition-colors hover:bg-slate-100 cursor-pointer"
           >
             <LogOut className="h-4 w-4" /> End Session
           </button>
@@ -133,11 +133,11 @@ export const KioskStudentDashboard: React.FC = () => {
             <div className="kiosk-action-card__icon-wrap mb-4">
               <Icon className="w-7 h-7" strokeWidth={1.5} />
             </div>
-            <h3 className="text-lg font-bold uppercase tracking-wide text-white">{title}</h3>
-            <p className="text-sm text-white/65 leading-relaxed mt-2 flex-1">{body}</p>
+            <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{title}</h3>
+            <p className="text-sm text-slate-500 leading-relaxed mt-2 flex-1">{body}</p>
             <div className="mt-5 flex items-center justify-between gap-2">
               <span className={`text-[11px] font-bold border px-2.5 py-1 rounded-full ${chip.tone}`}>{chip.label}</span>
-              <ChevronRight className="w-5 h-5 text-snc-neon group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="w-5 h-5 text-snc-green-mid group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
         ))}
