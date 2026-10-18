@@ -1,0 +1,10 @@
+{
+  "appId": "ph.edu.snc.permitkiosk",
+  "appName": "SNC Permit Kiosk",
+  "webDir": "dist",
+  "server": {
+    "url": "http://192.168.100.195:3200/kiosk",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  }
+}

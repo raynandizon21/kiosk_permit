@@ -82,10 +82,11 @@ npm run db:setup
 ```
 > ⚠️ Drops and recreates every table — only run this once, or again only if you want to reset to the starting data.
 
-If this PC will also serve tablets on the network, allow the port once — in **PowerShell as Administrator**:
+If this PC will also serve tablets on the network, allow the port once:
 ```
 npm run firewall:allow
 ```
+Approve the Windows UAC prompt when it appears (needed to change the firewall).
 
 **Every time you want the server running:**
 
@@ -115,12 +116,11 @@ The PC runs the server and the database. The tablet only opens a web page from i
 
 1. Connect the PC and the tablet to the **same Wi-Fi / network**.
 2. Allow port 3200 through Windows Firewall — once per PC:
-   1. Open **PowerShell as Administrator** (right-click PowerShell → *Run as administrator*).
-   2. `cd` into the project folder, then run:
+   1. From the project folder (a normal terminal is fine):
       ```
       npm run firewall:allow
       ```
-   3. This runs `scripts/allow-kiosk-port.ps1`, which:
+   2. Approve the Windows UAC prompt. The script (`scripts/allow-kiosk-port.ps1`) then:
       - Adds an inbound rule named **"SNC Permit Kiosk Port 3200"** for TCP 3200 on the **Private** network profile (skips it if the rule already exists).
       - Prints the PC's current LAN IP and the ready-to-use addresses, e.g.:
         ```
@@ -128,7 +128,7 @@ The PC runs the server and the database. The tablet only opens a web page from i
           Kiosk:  http://192.168.1.10:3200/kiosk
           Admin:  http://192.168.1.10:3200/admin
         ```
-   4. If it fails with a permissions error, it is not running as Administrator — close PowerShell and reopen it elevated. As a fallback: **Windows Firewall → Allow an app → Node.js → check Private**.
+   3. If you cancel UAC, or it still fails, as a fallback: **Windows Firewall → Allow an app → Node.js → check Private**.
 3. Start the server (`npm run dev`) and open the printed address on the tablet, e.g. `http://192.168.1.10:3200/kiosk`. In Chrome use *Add to Home screen* or a fullscreen/kiosk browser app.
 4. Give the PC a fixed IP (DHCP reservation on the router) so the tablet's link does not change.
 
@@ -140,12 +140,12 @@ The APK does **not** bundle the app offline — it's a [Capacitor](https://capac
 
 **One-time requirement:** [Android Studio](https://developer.android.com/studio) installed on the machine that builds the APK (it includes the Android SDK and Gradle). The APK does not need to be built on the same PC that runs the kiosk server.
 
-1. **Set the server address.** Open `capacitor.config.ts` and change `server.url` to the kiosk PC's LAN IP (the one from `npm run firewall:allow` / the server's startup output):
-   ```ts
-   server: {
-     url: 'http://192.168.1.10:3200/kiosk',   // ← change this
-     cleartext: true,
-     allowNavigation: ['*']
+1. **Set the server address.** Open `capacitor.config.json` and change `server.url` to the kiosk PC's LAN IP (the one from `npm run firewall:allow` / the server's startup output):
+   ```json
+   "server": {
+     "url": "http://192.168.1.10:3200/kiosk",
+     "cleartext": true,
+     "allowNavigation": ["*"]
    }
    ```
    (This is only the starting address — staff can still switch servers afterward from the **System Online** badge inside the app, same as the browser version.)
@@ -153,7 +153,7 @@ The APK does **not** bundle the app offline — it's a [Capacitor](https://capac
    ```
    npm run cap:sync
    ```
-   This runs `npm run build`, then `npx cap sync android`, which copies the build and `capacitor.config.ts` into `android/`.
+   This runs `npm run build`, then `npx cap sync android`, which copies the build and `capacitor.config.json` into `android/`.
 3. **Open the Android project in Android Studio:**
    ```
    npm run cap:open
@@ -280,13 +280,14 @@ The top bar holds the **exam term switcher** (Long Test Prelim / Prelim / Long T
 
 ```
 android/                    tablet APK (Capacitor), see "Building an Android APK"
-capacitor.config.ts         APK's server URL and settings
+capacitor.config.json       APK's server URL and settings
 database/
   schema.sql, seed.sql      fresh install
   setup.js                  npm run db:setup
   migrations/               upgrades for existing databases
 scripts/
   allow-kiosk-port.ps1      npm run firewall:allow
+  android-build.ps1         npm run android:debug / android:release (sets JAVA_HOME)
 server/
   config/                   MySQL pool
   routes/                   /api/... route files
@@ -309,13 +310,14 @@ public/images/uploads/      school logo and campus photo
 | Problem | Fix |
 |---|---|
 | **System Offline** on the kiosk | Start MySQL in XAMPP and check `MYSQL_*` in `.env`, then restart `npm run dev`. |
-| Tablet cannot open the page | Same Wi-Fi as the PC? Run `npm run firewall:allow` as Administrator. Use the PC's current IP from the server output. |
+| Tablet cannot open the page | Same Wi-Fi as the PC? Run `npm run firewall:allow` and approve the UAC prompt. Use the PC's current IP from the server output. |
 | "Student Number or LRN not found" | The student must exist and be active in **Student List**. |
 | Permit still locked after payment | The payment must cover that term's due (total ÷ 6, cumulative). Or clear it by hand in **Students & SOA**. |
 | Changes do not appear on another screen | Both screens must be connected to the same server. After updating the code, restart `npm run dev`. |
 | Port 3200 already in use | Another copy of the server is running, or change `PORT` in `.env`. |
-| APK installs but shows a blank/error screen | Wrong or unreachable IP in `capacitor.config.ts` → `server.url`. Fix it, then `npm run cap:sync` and rebuild the APK. Confirm the tablet is on the same Wi-Fi and `npm run dev` is running. |
+| APK installs but shows a blank/error screen | Wrong or unreachable IP in `capacitor.config.json` → `server.url`. Fix it, then `npm run cap:sync` and rebuild the APK. Confirm the tablet is on the same Wi-Fi and `npm run dev` is running. |
 | "App not installed" / blocked on the tablet | Enable **Install unknown apps** for the browser/file manager you used to open the APK (Android Settings → Apps → Special access), then try again. |
+| `JAVA_HOME is not set` | Install **Android Studio**. `npm run android:debug` / `android:release` use its bundled JDK automatically (`scripts/android-build.ps1`). |
 
 ---
 
