@@ -3,8 +3,10 @@
   "appName": "SNC Permit Kiosk",
   "webDir": "dist",
   "server": {
-    "url": "http://192.168.100.195:3200/kiosk",
-    "cleartext": true,
-    "allowNavigation": ["*"]
+    "androidScheme": "http",
+    "cleartext": true
+  },
+  "android": {
+    "backgroundColor": "#062b14"
   }
 }

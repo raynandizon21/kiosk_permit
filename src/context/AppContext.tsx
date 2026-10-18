@@ -13,7 +13,7 @@ import {
   TermKey,
   WithdrawalRequest
 } from '../types';
-import { api, errorMessage } from '../lib/api';
+import { api, apiUrl, errorMessage } from '../lib/api';
 import { useAuth } from './AuthContext';
 import { playPrinterSound, playSuccessChime } from '../utils/audio';
 import { peso } from '../utils/format';
@@ -358,7 +358,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   userRef.current = user;
 
   useEffect(() => {
-    const source = new EventSource('/api/events');
+    const source = new EventSource(apiUrl('/api/events'));
     let adminReload: number | undefined;
 
     source.onmessage = (msg) => {

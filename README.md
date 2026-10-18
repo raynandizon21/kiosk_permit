@@ -136,19 +136,15 @@ Tap the **System Online** badge on any screen to see which server it is connecte
 
 ## Building an Android APK
 
-The APK does **not** bundle the app offline — it's a [Capacitor](https://capacitorjs.com) WebView shell that opens the kiosk page from the PC on the same Wi-Fi, exactly like opening the URL in a tablet browser above. This avoids keeping a second copy of the app in sync; the tablet always shows whatever is currently running on the PC.
+The APK is a [Capacitor](https://capacitorjs.com) app that **bundles the kiosk screens**, so it opens instantly, full screen and in landscape, even when the server PC is off (the badge just shows **System Offline** until it can reach the server). Student data still comes from the PC on the same Wi-Fi, through its `/api`. Rebuild the APK whenever you change the frontend.
 
 **One-time requirement:** [Android Studio](https://developer.android.com/studio) installed on the machine that builds the APK (it includes the Android SDK and Gradle). The APK does not need to be built on the same PC that runs the kiosk server.
 
-1. **Set the server address.** Open `capacitor.config.json` and change `server.url` to the kiosk PC's LAN IP (the one from `npm run firewall:allow` / the server's startup output):
-   ```json
-   "server": {
-     "url": "http://192.168.1.10:3200/kiosk",
-     "cleartext": true,
-     "allowNavigation": ["*"]
-   }
+1. **Set the server address.** Open `src/lib/api.ts` and change `DEFAULT_SERVER` to the kiosk PC's LAN IP (the one from `npm run firewall:allow` / the server's startup output):
+   ```ts
+   const DEFAULT_SERVER = 'http://192.168.1.10:3200';
    ```
-   (This is only the starting address — staff can still switch servers afterward from the **System Online** badge inside the app, same as the browser version.)
+   (This is only the starting address. Staff can switch servers afterward from the **System Online** badge inside the app, and the app remembers the choice.)
 2. **Build the web app and sync it into the Android project:**
    ```
    npm run cap:sync
@@ -280,7 +276,7 @@ The top bar holds the **exam term switcher** (Long Test Prelim / Prelim / Long T
 
 ```
 android/                    tablet APK (Capacitor), see "Building an Android APK"
-capacitor.config.json       APK's server URL and settings
+capacitor.config.json       APK settings (the APK's server address is DEFAULT_SERVER in src/lib/api.ts)
 database/
   schema.sql, seed.sql      fresh install
   setup.js                  npm run db:setup
@@ -315,7 +311,7 @@ public/images/uploads/      school logo and campus photo
 | Permit still locked after payment | The payment must cover that term's due (total ÷ 6, cumulative). Or clear it by hand in **Students & SOA**. |
 | Changes do not appear on another screen | Both screens must be connected to the same server. After updating the code, restart `npm run dev`. |
 | Port 3200 already in use | Another copy of the server is running, or change `PORT` in `.env`. |
-| APK installs but shows a blank/error screen | Wrong or unreachable IP in `capacitor.config.json` → `server.url`. Fix it, then `npm run cap:sync` and rebuild the APK. Confirm the tablet is on the same Wi-Fi and `npm run dev` is running. |
+| APK shows **System Offline** | Tap the badge and connect to the PC's current IP. Confirm the tablet is on the same Wi-Fi and `npm run dev` is running. |
 | "App not installed" / blocked on the tablet | Enable **Install unknown apps** for the browser/file manager you used to open the APK (Android Settings → Apps → Special access), then try again. |
 | `JAVA_HOME is not set` | Install **Android Studio**. `npm run android:debug` / `android:release` use its bundled JDK automatically (`scripts/android-build.ps1`). |
 

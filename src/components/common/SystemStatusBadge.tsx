@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Database, Link2, Monitor, Server, X } from 'lucide-react';
-import { api, fetchHealth } from '../../lib/api';
+import { api, fetchHealth, isNativeApp, serverUrl, setServerUrl } from '../../lib/api';
 
 type SystemStatus = 'checking' | 'online' | 'offline';
 
@@ -36,7 +36,7 @@ function toServerUrl(input: string): string | null {
   try {
     const url = new URL(/^https?:\/\//i.test(raw) ? raw : `http://${raw}`);
     if (!/^[a-z0-9.-]+$/i.test(url.hostname)) return null;
-    if (!url.port && !/^https?:\/\//i.test(raw)) url.port = window.location.port || '3200';
+    if (!url.port && !/^https?:\/\//i.test(raw)) url.port = (!isNativeApp() && window.location.port) || '3200';
     return url.origin;
   } catch {
     return null;
@@ -89,6 +89,12 @@ export default function SystemStatusBadge({ className = '', variant = 'dark' }: 
       setError('Enter an IP address, e.g. 192.168.1.10');
       return;
     }
+    if (isNativeApp()) {
+      // APK: the UI is bundled, only the API server changes
+      setServerUrl(base);
+      window.location.reload();
+      return;
+    }
     window.location.href = `${base}${window.location.pathname}`;
   };
 
@@ -123,7 +129,7 @@ export default function SystemStatusBadge({ className = '', variant = 'dark' }: 
               <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Connected to</div>
               <div className="mt-1 flex items-center gap-2 font-mono-code text-sm font-semibold text-slate-900">
                 <Link2 className="h-4 w-4 shrink-0 text-snc-green-mid" />
-                {window.location.origin}
+                {serverUrl()}
               </div>
               <div className="mt-2 flex flex-wrap gap-2 text-xs">
                 <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${status === 'online' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
