@@ -100,7 +100,7 @@ export const KioskPermitModal: React.FC<KioskPermitModalProps> = ({ onClose, onO
               {selectedTerm} Examination Permit
             </div>
             <div className="text-xs text-slate-500">
-              No. <span className="font-mono-code font-bold text-slate-800">{permit.permitNumber}</span>
+              No. <span className="font-mono-code font-bold text-red-600">{permit.permitNumber}</span>
               {permit.status === 'promissory_cleared' && ' • Cleared via promissory note'}
               {permit.issuedAt && ` • Issued ${formatDateTime(permit.issuedAt)}`}
             </div>
@@ -118,9 +118,7 @@ export const KioskPermitModal: React.FC<KioskPermitModalProps> = ({ onClose, onO
               <tr>
                 <th className="py-2 pr-2">Code</th>
                 <th className="py-2 pr-2">Subject</th>
-                <th className="py-2 pr-2 text-center">Units</th>
-                <th className="py-2 pr-2 hidden sm:table-cell">Instructor</th>
-                <th className="py-2 text-center">Proctor Sign</th>
+                <th className="py-2 text-center">Units</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -128,9 +126,7 @@ export const KioskPermitModal: React.FC<KioskPermitModalProps> = ({ onClose, onO
                 <tr key={sub.code}>
                   <td className="py-2 pr-2 font-mono-code font-bold">{sub.code}</td>
                   <td className="py-2 pr-2">{sub.description}</td>
-                  <td className="py-2 pr-2 text-center">{sub.units}</td>
-                  <td className="py-2 pr-2 text-slate-600 hidden sm:table-cell">{sub.instructor}</td>
-                  <td className="py-2"><span className="block mx-auto w-20 border-b border-dashed border-slate-300 h-4" /></td>
+                  <td className="py-2 text-center">{sub.units}</td>
                 </tr>
               ))}
             </tbody>

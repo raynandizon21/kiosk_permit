@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertCircle, CheckCircle2, Clock, Eraser, FileSignature, Loader2, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Eraser, FileSignature, Loader2, Printer, XCircle } from 'lucide-react';
 import { useApp, ALL_EXAM_TERMS, TERM_KEY_MAP } from '../../context/AppContext';
 import { ExamTerm, PromissoryNote, ReasonCategory } from '../../types';
 import { playKeyClick, playSuccessChime, playErrorBuzz } from '../../utils/audio';
@@ -36,7 +36,7 @@ function twoWeeksFromNow() {
 }
 
 export const KioskPromissoryNoteModal: React.FC<KioskPromissoryNoteModalProps> = ({ onClose, onOpenPermit }) => {
-  const { activeStudent, currentExamTerm, studentNotes, submitPromissoryNote } = useApp();
+  const { activeStudent, currentExamTerm, studentNotes, submitPromissoryNote, triggerPrint } = useApp();
 
   const lockedTerms = activeStudent
     ? ALL_EXAM_TERMS.filter((t) => activeStudent.permits[TERM_KEY_MAP[t]].status === 'locked')
@@ -201,9 +201,20 @@ export const KioskPromissoryNoteModal: React.FC<KioskPromissoryNoteModalProps> =
                       <span className="font-mono-code font-bold text-slate-900">{note.referenceNo}</span>
                       <span className="text-slate-500"> · {note.term}</span>
                     </div>
-                    <span className={`text-xs font-bold border px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 ${ui.className}`}>
-                      <ui.icon className="w-3.5 h-3.5" /> {ui.label}
-                    </span>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className={`text-xs font-bold border px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 ${ui.className}`}>
+                        <ui.icon className="w-3.5 h-3.5" /> {ui.label}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => { playKeyClick(); triggerPrint('promissory_receipt', activeStudent, note.term, note, undefined, true); }}
+                        aria-label={`Reprint promissory note ${note.referenceNo}`}
+                        title="Print"
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-snc-green hover:text-snc-green cursor-pointer"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-slate-600">
                     Promised <strong>{peso(note.committedAmount)}</strong> on {formatDate(note.committedPaymentDate)} · {note.reasonCategory} · Submitted {formatDateTime(note.submittedAt)}
