@@ -17,7 +17,7 @@ export const AdminCourses: React.FC = () => (
     fields={[
       { key: 'code', label: 'Code', required: true, placeholder: 'BSIT', mono: true },
       { key: 'name', label: 'Course name', required: true, placeholder: 'BS Information Technology' },
-      { key: 'department', label: 'Department', placeholder: 'College of Computer Studies' }
+      { key: 'department', label: 'Description', placeholder: 'College of Computer Studies' }
     ]}
   />
 );
